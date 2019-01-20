@@ -1,0 +1,26 @@
+
+sample_id: "tiny_test_atac_1"
+fastq1:
+  - class: File
+    path: ../../sample1_1.fastq
+  - class: File
+    path: ../../sample2_1.fastq
+fastq2:
+  - class: File
+    path: ../../sample1_2.fastq
+  - class: File
+    path: ../../sample2_2.fastq
+reference:
+  class: File
+  path: ../../ref_genome.fa
+reference_info:
+  class: File
+  path: ../../ref_genome.chrom.sizes
+macs2_genome_size: "199"
+adapter1: 
+  - "AGT"
+  - "AGT"
+adapter2: 
+  - "AGT"
+  - "AGT"
+fragment_size: 10
