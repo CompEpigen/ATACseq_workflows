@@ -75,8 +75,6 @@ steps:
         default: true
       max_mapping_insert_length:
         source: max_mapping_insert_length
-      sample_id:
-        source: sample_id
     out:
       - pre_trim_fastqc_zip
       - pre_trim_fastqc_html
