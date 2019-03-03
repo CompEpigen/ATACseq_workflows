@@ -13,18 +13,6 @@ hints:
 
 baseCommand: ["bamCoverage"]
 arguments:  
-  - valueFrom: --extendReads
-    position: 1
-  - valueFrom: |
-      ${
-        if ( inputs.is_paired_end ){
-           return null;
-        }
-        else {
-          return inputs.fragment_size;
-        }
-      }
-    position: 2
   - valueFrom: $(inputs.bam.nameroot + ".bigwig")
     prefix: --outFileName
     position: 10
@@ -43,12 +31,6 @@ inputs:
     inputBinding:
         position: 100
         prefix: --bam
-  is_paired_end:
-    doc: if false, reads are extended by fragment_size
-    type: boolean
-  fragment_size:
-    doc: mean library fragment size; used to extend the reads
-    type: long?
   effective_genome_size:
     doc: |
       the effectively mappable genome size, 

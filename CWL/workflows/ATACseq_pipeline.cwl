@@ -33,8 +33,6 @@ inputs:
       - ^.rev.2.bt2
   reference_info:
     type: File
-  macs2_genome_size:
-    type: string
   adapter1: 
     type: 
       type: array
@@ -46,12 +44,24 @@ inputs:
   max_mapping_insert_length:
     type: long
     default: 2500
+  macs2_genome_size:
+    type: string
   shift_bps_upstream:
     type: int
     default: 37
   extend_bps_downstream:
     type: int
     default: 73
+  effective_genome_size:
+    type: long
+  bin_size:
+    type: int?
+    default: 10
+  ignoreForNormalization:
+    type:
+      type: array
+      items: string
+    default: ["chrX", "chrY", "chrM"]
   
 steps:
   #########################################################################################################

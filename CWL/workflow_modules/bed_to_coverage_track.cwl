@@ -8,6 +8,14 @@ inputs:
     type: File
   reference_info:
     type: File
+  effective_genome_size:
+    type: long
+  bin_size:
+    type: int
+  ignoreForNormalization:
+    type:
+      type: array
+      items: string
 
 ### WORKFLOW STEPS:
 ##################################################
@@ -46,46 +54,31 @@ steps:
     out:
        - bam_sorted_indexed
 
-  converting_bed_to_bedgraph:
-    doc:  bedtools genomeCov -bg
-    run: "../tools/bedtools_genomecov.cwl"
+  converting_bam_to_bigwig:
+    doc: |
+      deeptools bamCoverage
+    run: "../tools/deeptools_bamCoverage.cwl"
     in:
-      bed:
-        source: bed
-      reference_info:
-        source: reference_info
-    out:
-      - bedgraph
-
-  sorting_bedgraph:
-    doc: LC_COLLATE=C sort -k1,1 -k2,2n 
-    run: "../tools/bedgraph_sort.cwl"
-    in:
-      bedgraph:
-        source: converting_bed_to_bedgraph/bedgraph
-    out:
-      - bedgraph_sorted
-
-  converting_bedgraph_to_bigwig:
-    doc: bedGraphToBigWig (kentUtils)
-    run: "../tools/kentutils_bedGraphToBigWig.cwl"
-    in:
-      bedgraph_sorted:
-        source: sorting_bedgraph/bedgraph_sorted
-      reference_info:
-        source: reference_info
+      bam:
+        source: indexing_bam/bam_sorted_indexed
+      effective_genome_size:
+        source: effective_genome_size
+      binSize:
+        source: binSize
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
 
 ### OUTPUTS:
 ##################################################
 outputs:
-  bigwig:
-    type: File
-    outputSource: converting_bedgraph_to_bigwig/bigwig
   bam:
     type: File
     outputSource: indexing_bam/bam_sorted_indexed
+  bigwig:
+    type: File
+    outputSource: converting_bam_to_bigwig/bigwig
     
   
     
