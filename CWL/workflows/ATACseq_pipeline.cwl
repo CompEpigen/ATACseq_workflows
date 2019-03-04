@@ -55,7 +55,7 @@ inputs:
   effective_genome_size:
     type: long
   bin_size:
-    type: int?
+    type: int
     default: 10
   ignoreForNormalization:
     type:
@@ -189,6 +189,12 @@ steps:
         source: generating_atac_signal_tags/bed_tn5_bind_region_signal
       reference_info:
         source: reference_info
+      effective_genome_size:
+        source: effective_genome_size
+      bin_size:
+        source: bin_size
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
       - bam
@@ -201,6 +207,12 @@ steps:
         source: generating_atac_signal_tags/bed_tn5_center_1bp_signal
       reference_info:
         source: reference_info
+      effective_genome_size:
+        source: effective_genome_size
+      bin_size:
+        source: bin_size
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
       - bam
@@ -213,6 +225,12 @@ steps:
         source: generating_atac_signal_tags/bed_nucl_free_signal
       reference_info:
         source: reference_info
+      effective_genome_size:
+        source: effective_genome_size
+      bin_size:
+        source: bin_size
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
       - bam
@@ -225,6 +243,12 @@ steps:
         source: generating_atac_signal_tags/bed_nucl_bound_signal
       reference_info:
         source: reference_info
+      effective_genome_size:
+        source: effective_genome_size
+      bin_size:
+        source: bin_size
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
       - bam
@@ -237,6 +261,12 @@ steps:
         source: generating_atac_signal_tags/bed_fragments_tn5_incl_signal
       reference_info:
         source: reference_info
+      effective_genome_size:
+        source: effective_genome_size
+      bin_size:
+        source: bin_size
+      ignoreForNormalization:
+        source: ignoreForNormalization
     out:
       - bigwig
       - bam
