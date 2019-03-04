@@ -64,7 +64,7 @@ steps:
       effective_genome_size:
         source: effective_genome_size
       bin_size:
-        source: bin_Size
+        source: bin_size
       ignoreForNormalization:
         source: ignoreForNormalization
     out:
