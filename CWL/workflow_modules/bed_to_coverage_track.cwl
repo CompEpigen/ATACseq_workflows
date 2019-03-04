@@ -63,8 +63,8 @@ steps:
         source: indexing_bam/bam_sorted_indexed
       effective_genome_size:
         source: effective_genome_size
-      binSize:
-        source: binSize
+      bin_size:
+        source: bin_Size
       ignoreForNormalization:
         source: ignoreForNormalization
     out:
