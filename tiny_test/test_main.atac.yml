@@ -24,3 +24,4 @@ adapter2:
   - "AGT"
   - "AGT"
 fragment_size: 10
+effective_genome_size: 199
