@@ -337,16 +337,16 @@ steps:
     out:
       - bedgraph_sorted
 
-  converting_shift_ext_bedgraph_to_bigwig:
-    doc: bedGraphToBigWig (kentUtils)
-    run: "../tools/kentutils_bedGraphToBigWig.cwl"
-    in:
-      bedgraph_sorted:
-        source: sorting_shift_ext_bedgraph/bedgraph_sorted
-      reference_info:
-        source: reference_info
-    out:
-      - bigwig
+  # converting_shift_ext_bedgraph_to_bigwig:
+  #   doc: bedGraphToBigWig (kentUtils)
+  #   run: "../tools/kentutils_bedGraphToBigWig.cwl"
+  #   in:
+  #     bedgraph_sorted:
+  #       source: sorting_shift_ext_bedgraph/bedgraph_sorted
+  #     reference_info:
+  #       source: reference_info
+  #   out:
+  #     - bigwig
 
   #########################################################################################################
   ## Nucleosome position calling using NucleoATAC:
@@ -604,7 +604,10 @@ outputs:
     outputSource: peak_calling_macs2_tn5_center/peaks_xls
   bigwig_tn5_center_shift_ext_signal:
     type: File
-    outputSource: converting_shift_ext_bedgraph_to_bigwig/bigwig
+    outputSource: sorting_shift_ext_bedgraph/bedgraph_sorted
+  # bigwig_tn5_center_shift_ext_signal:
+  #   type: File
+  #   outputSource: converting_shift_ext_bedgraph_to_bigwig/bigwig
 
   # nucl_occ_tracks:
   #   type: File?
