@@ -19,7 +19,15 @@ arguments:
   - valueFrom: "bigwig"
     prefix: --outFileFormat
     position: 10
-  - valueFrom: "RPGC"
+  - valueFrom: |
+        ${ 
+          if( inputs.spike_in_count == null ){
+            return "RPGC"
+          }
+          else{
+            return null 
+          }
+        }
     prefix: --normalizeUsing
     position: 10
   
@@ -65,7 +73,7 @@ inputs:
             return null
           }
           else{
-            (1.0 / parseFloat(self)) 
+            return (1.0 / parseFloat(self)) 
           }
         }
 
