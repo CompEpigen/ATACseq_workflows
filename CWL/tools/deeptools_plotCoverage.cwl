@@ -3,7 +3,6 @@ cwlVersion: v1.0
 class: CommandLineTool
 requirements:
   InlineJavascriptRequirement: {}
-  StepInputExpressionRequirement: {}
 hints:
   ResourceRequirement:
     coresMin: 1
@@ -37,10 +36,10 @@ arguments:
   - valueFrom: $(inputs.sample_id)
     prefix: --labels
     position: 10
-  - valueFrom: $(inputs.sample_id + ".plot_cov.png")
+  - valueFrom: $(inputs.sample_id).plot_cov.png
     prefix: --plotFile
     position: 10
-  - valueFrom: $(inputs.sample_id + ".plot_cov.tsv")
+  - valueFrom: $(inputs.sample_id).plot_cov.tsv
     prefix: --outRawCounts
     position: 10
   
@@ -65,9 +64,9 @@ outputs:
   qc_plot_coverage_plot:
     type: File
     outputBinding:
-      glob: $(inputs.sample_id + ".plot_cov.png")
+      glob: $(inputs.sample_id).plot_cov.png
   qc_plot_coverage_tsv:
     type: File
     outputBinding:
-      glob: $(inputs.sample_id + ".plot_cov.tsv")
+      glob: $(inputs.sample_id).plot_cov.tsv
     

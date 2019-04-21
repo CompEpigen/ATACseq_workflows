@@ -1,5 +1,7 @@
 cwlVersion: v1.0
 class: CommandLineTool
+requirements:
+  InlineJavascriptRequirement: {}
 hints:
   ResourceRequirement:
     coresMin: 1
