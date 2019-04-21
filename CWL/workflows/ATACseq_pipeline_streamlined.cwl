@@ -108,7 +108,7 @@ steps:
     out:
       - post_filter_fastqc_zip
       - post_filter_fastqc_html
-      - picard_markdup_stdout
+      - picard_markdup_log
       - bam
 
   name_sorting_filtered_bam:
@@ -468,7 +468,7 @@ steps:
           - qc_plot_fingerprint/qc_plot_fingerprint_tsv
           - qc_phantompeakqualtools/qc_phantompeakqualtools_stdout
           - qc_phantompeakqualtools/qc_crosscorr_summary
-          - merge_duprem_filter/picard_markdup_stdout
+          - merge_duprem_filter/picard_markdup_log
         linkMerge: merge_flattened
       report_name:
         source: sample_id
@@ -534,9 +534,9 @@ outputs:
     type: File
     secondaryFiles: .bai
     outputSource: merge_duprem_filter/bam
-  picard_markdup_stdout:
+  picard_markdup_log:
     type: File
-    outputSource: merge_duprem_filter/picard_markdup_stdout
+    outputSource: merge_duprem_filter/picard_markdup_log
 
   frag_size_stats_tsv:
     type: File
