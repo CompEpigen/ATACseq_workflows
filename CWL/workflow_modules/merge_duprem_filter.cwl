@@ -32,7 +32,6 @@ steps:
       output_name:
         source: sample_id
         valueFrom: $(self + ".bam")
-  
     out:
        - bam_merged
 
@@ -44,53 +43,68 @@ steps:
         source: lane_replicate_merging/bam_merged
     out:
        - bam_sorted
-
-  remove_duplicates:
-    doc: picard markdup - emoves duplicates from a single sorted bam file.
-    run: "../tools/picard_markdup.cwl"
+       
+  flagstat_merged:
+    doc: samtools flagstat on merged bams
+    run: "../tools/samtools_flagstat.cwl"
     in:
-      bam_sorted:
-        source: sorting_merged_bam/bam_sorted
+      bam: sorting_merged_bam/bam_sorted
     out:
-      - bam_duprem
-      - picard_markdup_log
+      - flagstat_output
 
   filter_by_mapq:
     doc: samtools view
     run: "../tools/samtools_view_filter.cwl"
     in:
       bam:
-        source: remove_duplicates/bam_duprem
+        source: sorting_merged_bam/bam_sorted
       is_paired_end:
         source: is_paired_end
     out:
       - bam_filtered
 
-  sorting_filtered_bam:
-    doc: samtools sort - sorting of filtered bam
-    run: "../tools/samtools_sort.cwl"
+  flagstat_filtered:
+    doc: samtools flagstat on quality filtered bams
+    run: "../tools/samtools_flagstat.cwl"
     in:
-      bam_unsorted:
+      bam: filter_by_mapq/bam_filtered
+    out:
+      - flagstat_output
+
+  remove_duplicates:
+    doc: picard markdup - emoves duplicates from a single sorted bam file.
+    run: "../tools/picard_markdup.cwl"
+    in:
+      bam_sorted:
         source: filter_by_mapq/bam_filtered
     out:
-       - bam_sorted
+      - bam_duprem
+      - picard_markdup_log
 
-  indexing_filtered_bam:
+  flagstat_duprem:
+    doc: samtools flagstat on merged bams
+    run: "../tools/samtools_flagstat.cwl"
+    in:
+      bam: remove_duplicates/bam_duprem
+    out:
+      - flagstat_output
+
+  indexing_duprem_bam:
     doc: |
       samtools index - indexes sorted bam
     run: "../tools/samtools_index_hack.cwl"
     in:
       bam_sorted:
-        source: sorting_filtered_bam/bam_sorted
+        source: remove_duplicates/bam_duprem
     out:
        - bam_sorted_indexed
 
-  qc_post_filtering:
+  qc_duprem:
     doc: fastqc - quality control for reads directly after mapping
     run: "../tools/fastqc.cwl"
     in:
       bam:
-        source: indexing_filtered_bam/bam_sorted_indexed
+        source: indexing_duprem_bam/bam_sorted_indexed
     out:
       - fastqc_zip
       - fastqc_html
@@ -110,20 +124,29 @@ outputs:
   #bam_merged_duprem_filtered:
   #  type: File
   #  outputSource: filter_by_mapq/bam_filtered
-  post_filter_fastqc_zip:
+  duprem_fastqc_zip:
     type: 
       type: array
       items: File
-    outputSource: qc_post_filtering/fastqc_zip
-  post_filter_fastqc_html:
+    outputSource: qc_duprem/fastqc_zip
+  duprem_fastqc_html:
     type: 
       type: array
       items: File
-    outputSource: qc_post_filtering/fastqc_html
+    outputSource: qc_duprem/fastqc_html
+  merged_flagstat_output:
+    type: File
+    outputSource: flagstat_merged/flagstat_output
+  filtered_flagstat_output:
+    type: File
+    outputSource: flagstat_filtered/flagstat_output
+  duprem_flagstat_output:
+    type: File
+    outputSource: flagstat_duprem/flagstat_output
   bam:
     type: File
     secondaryFiles: .bai
-    outputSource: indexing_filtered_bam/bam_sorted_indexed
+    outputSource: indexing_duprem_bam/bam_sorted_indexed
   picard_markdup_log:
     type: File
     outputSource: remove_duplicates/picard_markdup_log

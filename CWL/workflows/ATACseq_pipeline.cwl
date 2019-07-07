@@ -86,13 +86,13 @@ steps:
       max_mapping_insert_length:
         source: max_mapping_insert_length
     out:
-      - pre_trim_fastqc_zip
-      - pre_trim_fastqc_html
+      - raw_fastqc_zip
+      - raw_fastqc_html
       - fastq1_trimmed
       - fastq2_trimmed
       - trim_galore_log
-      - post_trim_fastqc_html
-      - post_trim_fastqc_zip
+      - trimmed_fastqc_html
+      - trimmed_fastqc_zip
       - bam
       - bowtie2_log
  
@@ -106,8 +106,11 @@ steps:
       is_paired_end:
         default: true
     out:
-      - post_filter_fastqc_zip
-      - post_filter_fastqc_html
+      - duprem_fastqc_zip
+      - duprem_fastqc_html
+      - merged_flagstat_output
+      - filtered_flagstat_output
+      - duprem_flagstat_output
       - picard_markdup_log
       - bam
 
@@ -217,60 +220,6 @@ steps:
       - bigwig
       - bam
 
-  generating_nucl_free_signal_tracks:
-    doc:
-    run: "../workflow_modules/bed_to_coverage_track.cwl"
-    in:
-      bed:
-        source: generating_atac_signal_tags/bed_nucl_free_signal
-      reference_info:
-        source: reference_info
-      effective_genome_size:
-        source: effective_genome_size
-      bin_size:
-        source: bin_size
-      ignoreForNormalization:
-        source: ignoreForNormalization
-    out:
-      - bigwig
-      - bam
-
-  generating_nucl_bound_signal_tracks:
-    doc:
-    run: "../workflow_modules/bed_to_coverage_track.cwl"
-    in:
-      bed:
-        source: generating_atac_signal_tags/bed_nucl_bound_signal
-      reference_info:
-        source: reference_info
-      effective_genome_size:
-        source: effective_genome_size
-      bin_size:
-        source: bin_size
-      ignoreForNormalization:
-        source: ignoreForNormalization
-    out:
-      - bigwig
-      - bam
-
-  generating_fragments_tn5_excl_signal_tracks:
-    doc:
-    run: "../workflow_modules/bed_to_coverage_track.cwl"
-    in:
-      bed:
-        source: generating_atac_signal_tags/bed_fragments_tn5_incl_signal
-      reference_info:
-        source: reference_info
-      effective_genome_size:
-        source: effective_genome_size
-      bin_size:
-        source: bin_size
-      ignoreForNormalization:
-        source: ignoreForNormalization
-    out:
-      - bigwig
-      - bam
-
   ############################################################################################################################
   ## Peak calling:
   
@@ -337,53 +286,6 @@ steps:
     out:
       - bedgraph_sorted
 
-  converting_shift_ext_bedgraph_to_bigwig:
-    doc: bedGraphToBigWig (kentUtils)
-    run: "../tools/kentutils_bedGraphToBigWig.cwl"
-    in:
-      bedgraph_sorted:
-        source: sorting_shift_ext_bedgraph/bedgraph_sorted
-      reference_info:
-        source: reference_info
-    out:
-      - bigwig
-
-  #########################################################################################################
-  ## Nucleosome position calling using NucleoATAC:
-  
-  nucl_position_calling:
-    doc: NucleoATAC
-    run: "../tools/nucleoatac.cwl"
-    in:
-      bam:
-        source: merge_duprem_filter/bam
-      bed:
-        source: peak_calling_macs2_tn5_center/broad_peaks_bed
-      fasta:
-        source: reference
-      output_basename:
-        source: sample_id
-        valueFrom: $(self + ".nucleoatac")
-    out:
-      - nucl_occ_tracks
-      - nucl_occ_lower_bound_tracks
-      - nucl_occ_upper_bound_tracks
-      - nucl_dist_txt
-      - nucl_dist_plot
-      - fragsize_in_peaks_txt
-      - nucl_occ_fit_txt
-      - nucl_occ_fit_plot
-      - nucl_occ_peaks_bed
-      - nucl_vplot_data
-      - nucl_pos_bed
-      - nucl_pos_redundant_bed
-      - nucl_norm_crosscor_tracks
-      - nucl_norm_smooth_crosscor_tracks
-      - combined_nucl_pos_bed
-      - nfr_pos_bed
-      - nucleoatac_stderr
-      - nucleoatac_stdout
-
   ##########################################################################################################################
   ## Quality Controls:
 
@@ -400,19 +302,19 @@ steps:
 
   ## plot genome coverage:
   # (with respect to the complete fragment between a reads pair - i.e. the "open chrom" tracks)
-  qc_plot_coverage_fragments_tn5_excl:
-    doc: |
-      deeptools plotCoverage - plots how many times a certain fraction of the 
-      genome was covered (consideres the complete fragment between a reads pair).
-    run: "../tools/deeptools_plotCoverage.cwl"
-    in:
-      bam:
-        source: generating_fragments_tn5_excl_signal_tracks/bam
-      sample_id:
-        source: sample_id
-    out:
-      - qc_plot_coverage_plot  
-      - qc_plot_coverage_tsv
+  # qc_plot_coverage_fragments_tn5_excl:
+  #   doc: |
+  #     deeptools plotCoverage - plots how many times a certain fraction of the 
+  #     genome was covered (consideres the complete fragment between a reads pair).
+  #   run: "../tools/deeptools_plotCoverage.cwl"
+  #   in:
+  #     bam:
+  #       source: generating_fragments_tn5_excl_signal_tracks/bam
+  #     sample_id:
+  #       source: sample_id
+  #   out:
+  #     - qc_plot_coverage_plot  
+  #     - qc_plot_coverage_tsv
 
   qc_plot_fingerprint:
     run: "../tools/deeptools_plotFingerprint.cwl"
@@ -447,24 +349,24 @@ steps:
     in:
       qc_files_array_of_array:
         source:
-          - trim_and_map/pre_trim_fastqc_zip
-          - trim_and_map/pre_trim_fastqc_html
-          - trim_and_map/post_trim_fastqc_html
-          - trim_and_map/post_trim_fastqc_zip
+          - trim_and_map/raw_fastqc_zip
+          - trim_and_map/raw_fastqc_html
+          - trim_and_map/trimmed_fastqc_html
+          - trim_and_map/trimmed_fastqc_zip
           - trim_and_map/trim_galore_log
         linkMerge: merge_flattened
       qc_files_array:
         source:
           - trim_and_map/bowtie2_log
-          - merge_duprem_filter/post_filter_fastqc_zip
-          - merge_duprem_filter/post_filter_fastqc_html
+          - merge_duprem_filter/duprem_fastqc_zip
+          - merge_duprem_filter/duprem_fastqc_html
           - generating_atac_signal_tags/frag_size_stats_tsv
           - generating_atac_signal_tags/fragment_sizes_tsv
           - generating_atac_signal_tags/filtering_stats_tsv
           - plot_fragment_size_distribution/frag_size_distr_tsv
           - peak_calling_macs2_tn5_bind_region/peaks_xls
           - peak_calling_macs2_tn5_center/peaks_xls
-          - qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
+          # - qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
           - qc_plot_fingerprint/qc_plot_fingerprint_tsv
           - qc_phantompeakqualtools/qc_phantompeakqualtools_stdout
           - qc_phantompeakqualtools/qc_crosscorr_summary
@@ -479,57 +381,66 @@ steps:
   ##########################################################################################################################
 
 outputs:
-  pre_trim_fastqc_zip:
+  raw_fastqc_zip:
     type:
       type: array
       items: 
         type: array
         items: File
-    outputSource: trim_and_map/pre_trim_fastqc_zip
-  pre_trim_fastqc_html:
+    outputSource: trim_and_map/raw_fastqc_zip
+  raw_fastqc_html:
     type:
       type: array
       items: 
         type: array
         items: File
-    outputSource: trim_and_map/pre_trim_fastqc_html
+    outputSource: trim_and_map/raw_fastqc_html
   trim_galore_log:
     type:
       type: array
       items: 
         type: array
         items: File
-    outputSource: trim_and_map/pre_trim_fastqc_zip
-  post_trim_fastqc_html:
+    outputSource: trim_and_map/raw_fastqc_zip
+  trimmed_fastqc_html:
     type:
       type: array
       items: 
         type: array
         items: File
-    outputSource: trim_and_map/post_trim_fastqc_html
-  post_trim_fastqc_zip:
+    outputSource: trim_and_map/trimmed_fastqc_html
+  trimmed_fastqc_zip:
     type:
       type: array
       items: 
         type: array
         items: File
-    outputSource: trim_and_map/post_trim_fastqc_zip
+    outputSource: trim_and_map/trimmed_fastqc_zip
   bowtie2_log:
     type:
       type: array
       items: File
     outputSource: trim_and_map/bowtie2_log
 
-  post_filter_fastqc_zip:
+  duprem_fastqc_zip:
     type:
       type: array
       items: File
-    outputSource: merge_duprem_filter/post_filter_fastqc_zip
-  post_filter_fastqc_html:
+    outputSource: merge_duprem_filter/duprem_fastqc_zip
+  duprem_fastqc_html:
     type:
       type: array
       items: File
-    outputSource: merge_duprem_filter/post_filter_fastqc_html
+    outputSource: merge_duprem_filter/duprem_fastqc_html
+  merged_flagstat_output:
+    type: File
+    outputSource: merge_duprem_filter/merged_flagstat_output
+  filtered_flagstat_output:
+    type: File
+    outputSource: merge_duprem_filter/filtered_flagstat_output
+  duprem_flagstat_output:
+    type: File
+    outputSource: merge_duprem_filter/duprem_flagstat_output
   bam:
     type: File
     secondaryFiles: .bai
@@ -554,18 +465,18 @@ outputs:
   bigwig_tn5_bind_region_signal:
     type: File
     outputSource: generating_tn5_bind_region_signal_tracks/bigwig 
-  bigwig_tn5_center_1bp_signal:
-    type: File
-    outputSource: generating_tn5_center_1bp_signal_tracks/bigwig 
-  bigwig_nucl_free_signal:
-    type: File
-    outputSource: generating_nucl_free_signal_tracks/bigwig  
-  bigwig_nucl_bound_signal:
-    type: File
-    outputSource: generating_nucl_bound_signal_tracks/bigwig
-  bigwig_fragments_tn5_excl_signal:
-    type: File
-    outputSource: generating_fragments_tn5_excl_signal_tracks/bigwig
+  # bigwig_tn5_center_1bp_signal:
+  #   type: File
+  #   outputSource: generating_tn5_center_1bp_signal_tracks/bigwig 
+  # bigwig_nucl_free_signal:
+  #   type: File
+  #   outputSource: generating_nucl_free_signal_tracks/bigwig  
+  # bigwig_nucl_bound_signal:
+  #   type: File
+  #   outputSource: generating_nucl_bound_signal_tracks/bigwig
+  # bigwig_fragments_tn5_excl_signal:
+  #   type: File
+  #   outputSource: generating_fragments_tn5_excl_signal_tracks/bigwig
 
   bam_tn5_bind_region_signal:
     type: File
@@ -604,62 +515,10 @@ outputs:
     outputSource: peak_calling_macs2_tn5_center/peaks_xls
   bigwig_tn5_center_shift_ext_signal:
     type: File
-    outputSource: converting_shift_ext_bedgraph_to_bigwig/bigwig
-
-  nucl_occ_tracks:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_tracks
-  nucl_occ_lower_bound_tracks:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_lower_bound_tracks
-  nucl_occ_upper_bound_tracks:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_upper_bound_tracks
-  nucl_dist_txt:
-    type: File?
-    outputSource: nucl_position_calling/nucl_dist_txt
-  nucl_dist_plot:
-    type: File?
-    outputSource: nucl_position_calling/nucl_dist_plot
-  fragsize_in_peaks_txt:
-    type: File?
-    outputSource: nucl_position_calling/fragsize_in_peaks_txt
-  nucl_occ_fit_txt:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_fit_txt
-  nucl_occ_fit_plot:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_fit_plot
-  nucl_occ_peaks_bed:
-    type: File?
-    outputSource: nucl_position_calling/nucl_occ_peaks_bed
-  nucl_vplot_data:
-    type: File?
-    outputSource: nucl_position_calling/nucl_vplot_data
-  nucl_pos_bed:
-    type: File?
-    outputSource: nucl_position_calling/nucl_pos_bed
-  nucl_pos_redundant_bed:
-    type: File?
-    outputSource: nucl_position_calling/nucl_pos_redundant_bed
-  nucl_norm_crosscor_tracks:
-    type: File?
-    outputSource: nucl_position_calling/nucl_norm_crosscor_tracks
-  nucl_norm_smooth_crosscor_tracks:
-    type: File?
-    outputSource: nucl_position_calling/nucl_norm_smooth_crosscor_tracks
-  combined_nucl_pos_bed:
-    type: File?
-    outputSource: nucl_position_calling/combined_nucl_pos_bed
-  nfr_pos_bed:
-    type: File?
-    outputSource: nucl_position_calling/nfr_pos_bed
-  nucleoatac_stderr:
-    type: File
-    outputSource: nucl_position_calling/nucleoatac_stderr
-  nucleoatac_stdout:
-    type: File
-    outputSource: nucl_position_calling/nucleoatac_stdout
+    outputSource: sorting_shift_ext_bedgraph/bedgraph_sorted
+  # bigwig_tn5_center_shift_ext_signal:
+  #   type: File
+  #   outputSource: converting_shift_ext_bedgraph_to_bigwig/bigwig
 
   frag_size_distr_plot:
     type: File
@@ -667,12 +526,12 @@ outputs:
   frag_size_distr_tsv:
     type: File
     outputSource: plot_fragment_size_distribution/frag_size_distr_tsv
-  coverage_plot_fragments_tn5_excl:
-    type: File
-    outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_plot
-  coverage_counts_fragments_tn5_excl:
-    type: File
-    outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
+  # coverage_plot_fragments_tn5_excl:
+  #   type: File
+  #   outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_plot
+  # coverage_counts_fragments_tn5_excl:
+  #   type: File
+  #   outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
   qc_plot_fingerprint_plot:
     type: File?
     outputSource: qc_plot_fingerprint/qc_plot_fingerprint_plot
