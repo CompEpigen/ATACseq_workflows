@@ -46,12 +46,9 @@ inputs:
     default: 2500
   macs2_genome_size:
     type: string
-  shift_bps_upstream:
-    type: int
-    default: 37
-  extend_bps_downstream:
-    type: int
-    default: 73
+  macs2_qvalue:
+    type: float
+    default: 0.01
   effective_genome_size:
     type: long
   bin_size:
@@ -64,8 +61,6 @@ inputs:
     default: ["chrX", "chrY", "chrM"]
   
 steps:
-  #########################################################################################################
-  ## upstream processing
   trim_and_map:
     run: "../workflow_modules/trim_and_map.cwl"
     scatter: [fastq1, fastq2, adapter1, adapter2]
@@ -132,36 +127,6 @@ steps:
     out:
       - bedpe
 
-  ##################################################################################################
-  ## Generating ATAC signal (coverage tracks and peaks)
-  ## The standard procedure is to shift the read ends to represent the center of the transposition
-  ## event. However, not only the center of the transposition event represents accessible:
-  ## This approach consideres the bp length which is covered by Tn5 enzyme 
-  ## upon binding. Moreover, the span between the binding region is classified with respect to the
-  ## binding region size of a nucleosome.
-  ## Thereby, four signal tracks are generated:
-  ## (1) accessible/"naked" DNA: 
-  ##      - includes the Tn5 binding regions (TBR) of all reads
-  ## (2) nucleosome free:
-  ##      - includes the TBR of all reads
-  ##      - plus the region between two TBR (=insert region) if it is < 147 bp (size 
-  ##        of nucleosome binding region)
-  ## (3) potentially nucleosome bound:
-  ##      - exclude the TBR of all reads
-  ##      - include insert region if it is > 147 bp
-  ## (4) open chromatin / fragment tracks excluding tn5 binding region:
-  ##      - include the TBR of all reads
-  ##      - include insert region of all read pairs
-  ## This approach precisely reflects the accessiblity of the genome.
-  ## Moreover, it might be especially intresting for nucleosome positioning.
-  ## However, the advantages of this approach are rarely tested and 
-  ## there are also good reasons for using the established read shifting method 
-  ## (e.g. better comparability towards other studies).
-  ## Therefore, this workflow produces standard signal tags 
-  ## (where reads are shifted towards the center of the transposition event)
-  ## as proposed by the original ATAC paper (https://www.nature.com/articles/nmeth.2688)
-  ## and calls peaks on them as discribed in the encode pipeline.
-
   generating_atac_signal_tags:
     doc: 
     run: "../tools/generate_atac_signal_tags.cwl"
@@ -171,25 +136,29 @@ steps:
       output_basename:
         source: sample_id
     out:
-      # all output files are already sorted by coordinate
-      - bed_tn5_bind_region_signal # (1)
-      - bed_tn5_center_1bp_signal # (as original ATAC paper, only 1bp of the center of the transp. event)
-      - bed_nucl_free_signal # (2)
-      - bed_nucl_bound_signal # (3)
-      - bed_fragments_tn5_incl_signal # (4)
+      - bed_tn5_center_29bp
+      - bed_tn5_center_73bp
+      - bed_tn5_center_200bp
+      - bed_tn5_center_1bp
+      - bed_tn5_center_fragment
       - fragment_sizes_tsv
       - filtering_stats_tsv
       - frag_size_stats_tsv
       - irreg_mappings_bedpe
 
-  ## generate signal tracks:
-
-  generating_tn5_bind_region_signal_tracks:
+  generating_coverage_tracks:
     doc:
     run: "../workflow_modules/bed_to_coverage_track.cwl"
+    scatter: [bed]
+    scatterMethod: dotproduct
     in:
       bed:
-        source: generating_atac_signal_tags/bed_tn5_bind_region_signal
+        source: 
+          - generating_atac_signal_tags/bed_tn5_center_29bp
+          - generating_atac_signal_tags/bed_tn5_center_73bp
+          - generating_atac_signal_tags/bed_tn5_center_200bp
+          - generating_atac_signal_tags/bed_tn5_center_1bp
+          - generating_atac_signal_tags/bed_tn5_center_fragment
       reference_info:
         source: reference_info
       effective_genome_size:
@@ -202,92 +171,43 @@ steps:
       - bigwig
       - bam
 
-  generating_tn5_center_1bp_signal_tracks:
-    doc:
-    run: "../workflow_modules/bed_to_coverage_track.cwl"
-    in:
-      bed:
-        source: generating_atac_signal_tags/bed_tn5_center_1bp_signal
-      reference_info:
-        source: reference_info
-      effective_genome_size:
-        source: effective_genome_size
-      bin_size:
-        source: bin_size
-      ignoreForNormalization:
-        source: ignoreForNormalization
-    out:
-      - bigwig
-      - bam
-
-  ############################################################################################################################
-  ## Peak calling:
-  
-  ## peak calling and downstream QC - Tn5 binding region:
-
-  peak_calling_macs2_tn5_bind_region:
+  peak_calling_macs2_broad:
     doc: peak calling using macs2
-    run: "../tools/macs2_callpeak_atac_tn5_binding_region.cwl"
+    run: "../tools/macs2_callpeak_atac.cwl"
+    scatter: [treatment_bed]
+    scatterMethod: dotproduct
     in:
       treatment_bed:
-        source: generating_atac_signal_tags/bed_tn5_bind_region_signal
-      output_basename:
-        source: sample_id
-        valueFrom: $(self + "_tn5_bind_region.macs2")
+        source:
+          - generating_atac_signal_tags/bed_tn5_center_73bp
+          - generating_atac_signal_tags/bed_tn5_center_200bp
+          - generating_atac_signal_tags/bed_tn5_center_fragment
+        linkMerge: merge_flattened
       genome_size:
         source: macs2_genome_size
+      broad:
+        valueFrom: ${true}
+      qvalue:
+        source: macs2_qvalue
     out: 
-      - broad_peaks_bed
-      - gapped_peaks_bed
+      - peaks_bed
       - peaks_xls
-
-
-  ## peak calling and downstream QC - Tn5 center:
-  ## (following the peak calling approach of the encode pipeline)
-  peak_calling_macs2_tn5_center:
+      
+  peak_calling_macs2_narrow:
     doc: peak calling using macs2
-    run: "../tools/macs2_callpeak_atac_tn5_center.cwl"
+    run: "../tools/macs2_callpeak_atac.cwl"
     in:
       treatment_bed:
-        source: generating_atac_signal_tags/bed_tn5_center_1bp_signal
-      output_basename:
-        source: sample_id
-        valueFrom: $(self + "_tn5_center_shift_ext.macs2")
+        source: generating_atac_signal_tags/bed_tn5_center_29bp
       genome_size:
         source: macs2_genome_size
+      broad:
+        valueFrom: ${false}
+      qvalue:
+        source: macs2_qvalue
     out: 
-      - broad_peaks_bed
-      - gapped_peaks_bed
+      - peaks_bed
       - peaks_xls
-      - treat_pileup_bdg # coverage tracks of shifted and extended reads according to encode
-
-  ## convert shifted and extended coverage tracks to bigwig:
-
-  clip_shift_ext_bedgraph:
-    doc: clips features exceeding the chromosome boundaries
-    run: "../tools/bedtools_slop_clip.cwl"
-    in:
-      bed:
-        source: peak_calling_macs2_tn5_center/treat_pileup_bdg
-      reference_info:
-        source: reference_info
-    out:
-      - bed_clipped
-
-  sorting_shift_ext_bedgraph:
-    doc: LC_COLLATE=C sort -k1,1 -k2,2n 
-    run: "../tools/bedgraph_sort.cwl"
-    in:
-      bedgraph:
-        source: clip_shift_ext_bedgraph/bed_clipped
-      output_name:
-        source: sample_id
-        valueFrom: $(self + "_tn5_center_shift_ext.bedgraph")
-    out:
-      - bedgraph_sorted
-
-  ##########################################################################################################################
-  ## Quality Controls:
 
   plot_fragment_size_distribution:
     run: "../tools/plot_frag_size_distr.cwl"
@@ -300,27 +220,11 @@ steps:
       - frag_size_distr_plot
       - frag_size_distr_tsv
 
-  ## plot genome coverage:
-  # (with respect to the complete fragment between a reads pair - i.e. the "open chrom" tracks)
-  # qc_plot_coverage_fragments_tn5_excl:
-  #   doc: |
-  #     deeptools plotCoverage - plots how many times a certain fraction of the 
-  #     genome was covered (consideres the complete fragment between a reads pair).
-  #   run: "../tools/deeptools_plotCoverage.cwl"
-  #   in:
-  #     bam:
-  #       source: generating_fragments_tn5_excl_signal_tracks/bam
-  #     sample_id:
-  #       source: sample_id
-  #   out:
-  #     - qc_plot_coverage_plot  
-  #     - qc_plot_coverage_tsv
-
   qc_plot_fingerprint:
     run: "../tools/deeptools_plotFingerprint.cwl"
     in:
       bam:
-        source: generating_tn5_bind_region_signal_tracks/bam
+        source: merge_duprem_filter/bam
       sample_id:
         source: sample_id
       is_paired_end:
@@ -354,6 +258,7 @@ steps:
           - trim_and_map/trimmed_fastqc_html
           - trim_and_map/trimmed_fastqc_zip
           - trim_and_map/trim_galore_log
+          - peak_calling_macs2_broad/peaks_bed
         linkMerge: merge_flattened
       qc_files_array:
         source:
@@ -363,10 +268,10 @@ steps:
           - generating_atac_signal_tags/frag_size_stats_tsv
           - generating_atac_signal_tags/fragment_sizes_tsv
           - generating_atac_signal_tags/filtering_stats_tsv
+          - peak_calling_macs2_broad/peaks_xls
+          - peak_calling_macs2_narrow/peaks_bed
+          - peak_calling_macs2_narrow/peaks_xls
           - plot_fragment_size_distribution/frag_size_distr_tsv
-          - peak_calling_macs2_tn5_bind_region/peaks_xls
-          - peak_calling_macs2_tn5_center/peaks_xls
-          # - qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
           - qc_plot_fingerprint/qc_plot_fingerprint_tsv
           - qc_phantompeakqualtools/qc_phantompeakqualtools_stdout
           - qc_phantompeakqualtools/qc_crosscorr_summary
@@ -462,63 +367,37 @@ outputs:
     type: File
     outputSource: generating_atac_signal_tags/irreg_mappings_bedpe
 
-  bigwig_tn5_bind_region_signal:
-    type: File
-    outputSource: generating_tn5_bind_region_signal_tracks/bigwig 
-  # bigwig_tn5_center_1bp_signal:
-  #   type: File
-  #   outputSource: generating_tn5_center_1bp_signal_tracks/bigwig 
-  # bigwig_nucl_free_signal:
-  #   type: File
-  #   outputSource: generating_nucl_free_signal_tracks/bigwig  
-  # bigwig_nucl_bound_signal:
-  #   type: File
-  #   outputSource: generating_nucl_bound_signal_tracks/bigwig
-  # bigwig_fragments_tn5_excl_signal:
-  #   type: File
-  #   outputSource: generating_fragments_tn5_excl_signal_tracks/bigwig
+  bam_signal_tags:
+    type: 
+      type: array
+      items: File
+    outputSource: generating_coverage_tracks/bam 
+  bigwig_signal_tags:
+    type: 
+      type: array
+      items: File
+    outputSource: generating_coverage_tracks/bigwig 
 
-  bam_tn5_bind_region_signal:
+  peaks_bed_macs2_broad:
+    type:
+      type: array
+      items: 
+        type: array
+        items: File
+    outputSource: peak_calling_macs2_broad/peaks_bed
+  peaks_xls_macs2_broad:
+    type:
+      type: array
+      items: File
+    outputSource: peak_calling_macs2_broad/peaks_xls
+  peaks_bed_macs2_narrow:
+    type: 
+      type: array
+      items: File
+    outputSource: peak_calling_macs2_narrow/peaks_bed
+  peaks_xls_macs2_narrow:
     type: File
-    outputSource: generating_tn5_bind_region_signal_tracks/bam 
-  bam_tn5_center_1bp_signal:
-    type: File
-    outputSource: generating_tn5_center_1bp_signal_tracks/bam 
-#  bam_nucl_free_signal:
-#    type: File
-#    outputSource: generating_nucl_free_signal_tracks/bam  
-#  bam_nucl_bound_signal:
-#    type: File
-#    outputSource: generating_nucl_bound_signal_tracks/bam
-#  bam_fragments_tn5_excl_signal:
-#    type: File
-#    outputSource: generating_fragments_tn5_excl_signal_tracks/bam
-
-  broad_peaks_bed_tn5_bind_region_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_bind_region/broad_peaks_bed
-  gapped_peaks_bed_tn5_bind_region_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_bind_region/gapped_peaks_bed
-  peaks_xls_tn5_bind_region_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_bind_region/peaks_xls
-    
-  broad_peaks_bed_tn5_center_shift_ext_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_center/broad_peaks_bed
-  gapped_peaks_bed_tn5_center_shift_ext_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_center/gapped_peaks_bed
-  peaks_xls_tn5_center_shift_ext_signal:
-    type: File
-    outputSource: peak_calling_macs2_tn5_center/peaks_xls
-  bigwig_tn5_center_shift_ext_signal:
-    type: File
-    outputSource: sorting_shift_ext_bedgraph/bedgraph_sorted
-  # bigwig_tn5_center_shift_ext_signal:
-  #   type: File
-  #   outputSource: converting_shift_ext_bedgraph_to_bigwig/bigwig
+    outputSource: peak_calling_macs2_narrow/peaks_xls
 
   frag_size_distr_plot:
     type: File
@@ -526,12 +405,6 @@ outputs:
   frag_size_distr_tsv:
     type: File
     outputSource: plot_fragment_size_distribution/frag_size_distr_tsv
-  # coverage_plot_fragments_tn5_excl:
-  #   type: File
-  #   outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_plot
-  # coverage_counts_fragments_tn5_excl:
-  #   type: File
-  #   outputSource: qc_plot_coverage_fragments_tn5_excl/qc_plot_coverage_tsv
   qc_plot_fingerprint_plot:
     type: File?
     outputSource: qc_plot_fingerprint/qc_plot_fingerprint_plot

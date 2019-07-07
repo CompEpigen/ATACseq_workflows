@@ -16,30 +16,41 @@ requirements:
         entry: | 
           BEDPE="$1"
           OUTPUT_BASENAME="$2"
-          touch irreg_mappings.bedpe \
-            tn5_bind_region_unsorted.bed \  
-            fragments_tn5_incl_tags_unsorted.bed \ 
-            tn5_center_1bp_unsorted.bed \
-            pot_nucl_bound_tags_unsorted.bed \
-            nucl_free_tags_unsorted.bed \ 
-            fragment_sizes.txt
-          touch \${OUTPUT_BASENAME}_irreg_mappings.bedpe \
-            \${OUTPUT_BASENAME}_tn5_bind_region_unsorted.bed \  
-            \${OUTPUT_BASENAME}_fragments_tn5_incl_tags_unsorted.bed \ 
-            \${OUTPUT_BASENAME}_tn5_center_1bp_unsorted.bed \
-            \${OUTPUT_BASENAME}_pot_nucl_bound_tags_unsorted.bed \
-            \${OUTPUT_BASENAME}_nucl_free_tags_unsorted.bed \ 
-            \${OUTPUT_BASENAME}_irreg_mappings.bedpe
+          touch irreg_mappings.bedpe \ 
+            fragment_sizes.txt \
+            tn5_center_29bp_unsorted.bed \  
+            tn5_center_73bp_unsorted.bed \  
+            tn5_center_200bp_unsorted.bed \  
+            tn5_center_fragment_unsorted.bed \ 
+            tn5_center_1bp_unsorted.bed 
           awk generate_atac_signal_tag.awk "\${BEDPE}"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_bind_region_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_bind_region.bed"
+          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_29bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_29bp.bed"
+          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_73bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_73bp.bed"
+          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_200bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_200bp.bed"
+          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_fragment_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_fragment.bed"
           LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_1bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_1bp.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n nucl_free_tags_unsorted.bed > "\${OUTPUT_BASENAME}_nucl_free_tags.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n pot_nucl_bound_tags_unsorted.bed > "\${OUTPUT_BASENAME}_pot_nucl_bound_tags.bed" 
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n fragments_tn5_incl_tags_unsorted.bed > "\${OUTPUT_BASENAME}_fragments_tn5_incl_tags.bed"
+          rm tn5_center_29bp_unsorted.bed \  
+            tn5_center_73bp_unsorted.bed \  
+            tn5_center_200bp_unsorted.bed \  
+            tn5_center_fragment_unsorted.bed \ 
+            tn5_center_1bp_unsorted.bed 
           mv irreg_mappings.bedpe "\${OUTPUT_BASENAME}_irreg_mappings.bedpe"
           mv fragment_sizes.txt "\${OUTPUT_BASENAME}_fragment_sizes.txt"
       - entryname: generate_atac_signal_tag.awk
         entry: |
+          function tn5_center_ext(seqname, name, score, bp, center1, center2, output_file) { 
+            # bp must be uneven
+            tag_start = (center1-(bp/2));
+            tag_end = (center1+(bp/2)+1);
+            if(tag_start < 0){tag_start=0};
+            if(tag_end < 0){tag_end=0};
+            print seqname, tag_start, tag_end, name, score > output_file;
+            tag_start = (center2-(bp/2));
+            tag_end = (center2+(bp/2)+1);
+            if(tag_start < 0){tag_start=0};
+            if(tag_end < 0){tag_end=0};
+            print seqname, tag_start, tag_end, name".mate", score > output_file;
+          }
           BEGIN {
               OFS="\t";
               chrM_read_count=0;
@@ -76,21 +87,22 @@ requirements:
               }
               else {
                   right_orientation=0;
+                  # shift to center and calc fragment size
                   if ( $9=="+" && $2<=$5 && $3<=$6 ){
                       right_orientation=1;
                       fragment_size=$6-$2;
-                      start=$2;
-                      end=$6;
-                      print $1, $2+4, $2+5, $7, $8 >  tn5_center_1bp_unsorted.bed;
-                      print $1, $6-5, $6-4, ($7 "(mate)"), $8 >  tn5_center_1bp_unsorted.bed;
+                      # first read:
+                      center1=$2+4;
+                      # second read
+                      center2=$6-5;
                   }
                   else if ( $9=="-" && $2>=$5 && $3>=$6 ){
                       right_orientation=1;
                       fragment_size=$3-$5;
-                      start=$5;
-                      end=$3;
-                      print $1, $5+4, $5+5, $7, $8 >  tn5_center_1bp_unsorted.bed;
-                      print $1, $3-5, $3-4, ($7 "(mate)"), $8 >  tn5_center_1bp_unsorted.bed;
+                      # first read:
+                      center1=$5+4;
+                      # second read
+                      center2=$3-5;
                   }
                   else {
                       wrong_strand_orient_count += 2;
@@ -99,39 +111,16 @@ requirements:
                   print fragment_size >  fragment_sizes.txt;
                   if ( fragment_size>=38 && right_orientation ) {
                       regular_read_count += 2;
-                      tag_start = start-10;
-                      tag_end = start+19;
-                      if ( tag_start < 0) { tag_start = 0 }
-                      print $1, tag_start, tag_end, $7, $8 >  tn5_bind_region_unsorted.bed;
-                      tag_start = end-19;
-                      tag_end = end+10;
-                      if ( tag_start < 0) { tag_start = 0 }
-                      print $1, tag_start, tag_end, ($7 "(mate)"), $8 >  tn5_bind_region_unsorted.bed;
-                      tag_start = start-10;
-                      tag_end = end+10;
-                      if ( tag_start < 0) { tag_start = 0 }
-                      print $1, tag_start, tag_end, $7, $8 >  fragments_tn5_incl_tags_unsorted.bed;
+                      tn5_center_ext($1, $7, $8, 29, center1, center2, "tn5_center_29bp_unsorted.bed");
+                      tn5_center_ext($1, $7, $8, 73, center1, center2, "tn5_center_73bp_unsorted.bed");
+                      tn5_center_ext($1, $7, $8, 200, center1, center2, "tn5_center_200bp_unsorted.bed");
+                      tn5_center_ext($1, $7, $8, 1, center1, center2, "tn5_center_1bp_unsorted.bed");
+                      print $1, center1, center2, $7, $8 >  "tn5_center_fragment_unsorted.bed";
                       if (fragment_size>=185) { 
                           nucl_bound_fragment_count += 1;
-                          tag_start = start+19;
-                          tag_end = end-19;
-                          if ( tag_end < 0) { tag_end = 0 }
-                          print $1, tag_start, tag_end, $7, $8 >  pot_nucl_bound_tags_unsorted.bed;
-                          tag_start = start-10;
-                          tag_end = start+19;
-                          if ( tag_start < 0) { tag_start = 0 }
-                          print $1, tag_start, tag_end, $7, $8 >  nucl_free_tags_unsorted.bed;
-                          tag_start = end-19;
-                          tag_end = end+10;
-                          if ( tag_start < 0) { tag_start = 0 }
-                          print $1, tag_start, tag_end, ($7 "(mate)"), $8 >  nucl_free_tags_unsorted.bed;
                       }
                       else {
                           nucl_free_fragment_count += 1;
-                          tag_start = start-10;
-                          tag_end = end+10;
-                          if ( tag_start < 0) { tag_start = 0 }
-                          print $1, tag_start, tag_end, $7, $8 >  nucl_free_tags_unsorted.bed;
                       }
                   }
                   else {
@@ -181,26 +170,33 @@ inputs:
 ### OUTPUT PART:
 ##################################################
 outputs:
-  bed_tn5_bind_region_signal:
+  bed_tn5_center_29bp:
     type: File
     outputBinding:
-      glob: $(inputs.output_basename + "_tn5_bind_region.bed")
-  bed_tn5_center_1bp_signal:
+      glob: $(inputs.output_basename + "_tn5_center_29bp.bed")
+  bed_tn5_center_73bp:
+    type: File
+    outputBinding:
+      glob: $(inputs.output_basename + "_tn5_center_73bp.bed")
+  bed_tn5_center_200bp:
+    type: File
+    outputBinding:
+      glob: $(inputs.output_basename + "_tn5_center_200bp.bed")
+  bed_tn5_center_1bp:
     type: File
     outputBinding:
       glob: $(inputs.output_basename + "_tn5_center_1bp.bed")
-  bed_nucl_free_signal:
+  bed_tn5_center_fragment:
     type: File
     outputBinding:
-      glob: $(inputs.output_basename + "_nucl_free_tags.bed")
-  bed_nucl_bound_signal:
-    type: File
-    outputBinding:
-      glob: $(inputs.output_basename + "_pot_nucl_bound_tags.bed")
-  bed_fragments_tn5_incl_signal:
-    type: File
-    outputBinding:
-      glob: $(inputs.output_basename + "_fragments_tn5_incl_tags.bed")
+      glob: $(inputs.output_basename + "_tn5_center_fragment.bed")
+  # bed_signal_tags:
+  #   type:
+  #     type: array
+  #     items: File
+  #   outputBinding:
+  #     glob: "*.bed"
+    
   fragment_sizes_tsv:
     type: File
     outputBinding:
