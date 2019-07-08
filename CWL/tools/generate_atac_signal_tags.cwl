@@ -41,13 +41,21 @@ requirements:
       - entryname: generate_atac_signal_tag.awk
         entry: |
           function tn5_center_ext(seqname, name, score, bp, center1, center2, output_file) { 
-            tag_start = (center1-((bp-1)/2));
-            tag_end = (center1+((bp-1)/2)+1);
+            if( (bp%2) == 0 ) {
+              start_shift = bp/2
+              end_shift = bp/2
+            }
+            else {
+              start_shift = (bp-1)/2
+              end_shift = (bp-1)/2+1
+            }
+            tag_start = (center1-start_shift);
+            tag_end = (center1+end_shift+1);
             if(tag_start < 0){tag_start=0};
             if(tag_end < 0){tag_end=0};
             print seqname, tag_start, tag_end, name, score > output_file;
-            tag_start = (center2-((bp-1)/2));
-            tag_end = (center2+((bp-1)/2)+1);
+            tag_start = (center2-start_shift);
+            tag_end = (center2+end_shift+1);
             if(tag_start < 0){tag_start=0};
             if(tag_end < 0){tag_end=0};
             print seqname, tag_start, tag_end, name"_mate", score > output_file;
