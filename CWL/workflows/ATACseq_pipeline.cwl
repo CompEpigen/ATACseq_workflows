@@ -8,8 +8,6 @@ requirements:
   InlineJavascriptRequirement: {}
   MultipleInputFeatureRequirement: {}
 
-### INPUT PART:
-##################################################
 inputs:
   sample_id:
     type: string
@@ -186,7 +184,7 @@ steps:
       genome_size:
         source: macs2_genome_size
       broad:
-        valueFrom: ${true}
+        valueFrom: ${return(true)}
       qvalue:
         source: macs2_qvalue
     out: 
@@ -202,7 +200,7 @@ steps:
       genome_size:
         source: macs2_genome_size
       broad:
-        valueFrom: ${false}
+        valueFrom: ${return(false)}
       qvalue:
         source: macs2_qvalue
     out: 
@@ -282,8 +280,6 @@ steps:
     out:
       - multiqc_zip
       - multiqc_html
-
-  ##########################################################################################################################
 
 outputs:
   raw_fastqc_zip:
