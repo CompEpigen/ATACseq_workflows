@@ -22,7 +22,7 @@ arguments:
   - valueFrom: "all"
     prefix: "--keep-dup"
     position: 2
-  - valueFrom: ${inputs.treatment_bed.nameroot + ".macs2"}
+  - valueFrom: $(inputs.treatment_bed.nameroot + ".macs2")
     prefix: "--name"
     position: 100
 
