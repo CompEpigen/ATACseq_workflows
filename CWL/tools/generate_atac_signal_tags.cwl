@@ -14,8 +14,8 @@ requirements:
     listing: 
       - entryname: generate_atac_signal_tag.sh
         entry: | 
-          BEDPE="$1"
-          OUTPUT_BASENAME="$2"
+          BEDPE="\$1"
+          OUTPUT_BASENAME="\$2"
           touch irreg_mappings.bedpe 
           touch fragment_sizes.txt
           touch tn5_center_29bp_unsorted.bed 
