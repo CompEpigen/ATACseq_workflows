@@ -49,7 +49,7 @@ requirements:
             tag_end = (center2+(bp/2)+1);
             if(tag_start < 0){tag_start=0};
             if(tag_end < 0){tag_end=0};
-            print seqname, tag_start, tag_end, name".mate", score > output_file;
+            print seqname, tag_start, tag_end, name"_mate", score > output_file;
           }
           BEGIN {
               OFS="\t";
@@ -67,23 +67,23 @@ requirements:
                   irregular_read_count += 2;
                   if ( $1==$4 ) {
                       chrM_read_count += 2;
-                      print $0, "chrM" > irreg_mappings.bedpe ;
+                      print $0, "chrM" > "irreg_mappings.bedpe" ;
                   }
                   else {
                       chrM_read_count += 1;
                       interchrom_map_read_count += 2;
-                      print $0, "interchrom_map" > irreg_mappings.bedpe;
+                      print $0, "interchrom_map" > "irreg_mappings.bedpe";
                   }
               }
               else if ( $1!=$4 ) {
                   irregular_read_count += 2;
                   interchrom_map_read_count += 2;
-                  print $0, "interchrom_map" > irreg_mappings.bedpe;
+                  print $0, "interchrom_map" > "irreg_mappings.bedpe";
               }
               else if ( $9==$10 ) {
                   irregular_read_count += 2;
                   wrong_strand_orient_count += 2;
-                  print $0, "wrong_read_pair_orientation" > irreg_mappings.bedpe;
+                  print $0, "wrong_read_pair_orientation" > "irreg_mappings.bedpe";
               }
               else {
                   right_orientation=0;
@@ -106,9 +106,9 @@ requirements:
                   }
                   else {
                       wrong_strand_orient_count += 2;
-                      print $0, "wrong_read_pair_orientation" > irreg_mappings.bedpe;
+                      print $0, "wrong_read_pair_orientation" > "irreg_mappings.bedpe";
                   }
-                  print fragment_size >  fragment_sizes.txt;
+                  print "fragment_size" >  "fragment_sizes.txt";
                   if ( fragment_size>=38 && right_orientation ) {
                       regular_read_count += 2;
                       tn5_center_ext($1, $7, $8, 29, center1, center2, "tn5_center_29bp_unsorted.bed");
@@ -127,25 +127,25 @@ requirements:
                       if ( right_orientation ){
                           irregular_read_count += 2;
                           too_small_fragment_count += 1;
-                          print $0, "too_small_frag_size" > irreg_mappings.bedpe ;
+                          print $0, "too_small_frag_size" > "irreg_mappings.bedpe" ;
                       }
                   }
             }
           }
           END {
-              print "\# id: \"Filtering Statistics\"" >  filtering_stats_mqc.tsv;
+              print "\# id: \"Filtering Statistics\"" >  "filtering_stats_mqc.tsv";
               print "\# description: \"- This section shows statistics on read filtering: (1) reads pairs that are mapping to different chromosomes as well as (2) read pairs located on ChrM are filtered out; (3) read pairs that have a wrong orientation towards each other (e.g. both reads on same strand, or reads pointing to different direction) are removed, too. (4) Only the remaining regular reads are used for the fragment size analysis and the generation of atac signal tracks. In addition to the filtering shown here, reads were also selected for high mapping quality and to be mapped in a proper pair.\"" >  filtering_stats_mqc.tsv;
-              print "\# plot_type: \"bargraph\"" >  filtering_stats_mqc.tsv;
-              print "chrM_reads", chrM_read_count >  filtering_stats_mqc.tsv;
-              print "interchrom_map_reads", interchrom_map_read_count >  filtering_stats_mqc.tsv;
-              print "wrong_read_pair_orientation", wrong_strand_orient_count >  filtering_stats_mqc.tsv;
-              print "regular_reads", regular_read_count >  filtering_stats_mqc.tsv;
-              print "\# id: \"Fragment Length Classification\"" >  frag_size_classification_mqc.tsv;
+              print "\# plot_type: \"bargraph\"" >  "filtering_stats_mqc.tsv";
+              print "chrM_reads", "chrM_read_count" >  "filtering_stats_mqc.tsv";
+              print "interchrom_map_reads", "interchrom_map_read_count" >  "filtering_stats_mqc.tsv";
+              print "wrong_read_pair_orientation", "wrong_strand_orient_count" >  "filtering_stats_mqc.tsv";
+              print "regular_reads", "regular_read_count" >  "filtering_stats_mqc.tsv";
+              print "\# id: \"Fragment Length Classification\"" >  "frag_size_classification_mqc.tsv";
               print "\# description: \"Fragments are classified by their size: (1) nucleosome free fragements are smaller than a typical a nucleosome binding region while (2)) potentially nucleosome bound fragments are larger;(3) fragments that are classified as too small are shorter than expected for a Tn5 digestion. For these calculations, the DNA span that is covered by the Tn5 enzyme during the trasposition is taken into account.\"" >  frag_size_classification_mqc.tsv;
-              print "\# plot_type: \"bargraph\"" >  frag_size_classification_mqc.tsv;
-              print "too_small_fragments", too_small_fragment_count >  frag_size_classification_mqc.tsv;
-              print "nucl_free_fragments", nucl_free_fragment_count >  frag_size_classification_mqc.tsv;
-              print "pot_nucl_bound_fragments", nucl_bound_fragment_count >  frag_size_classification_mqc.tsv;
+              print "\# plot_type: \"bargraph\"" >  "frag_size_classification_mqc.tsv";
+              print "too_small_fragments", "too_small_fragment_count" >  "frag_size_classification_mqc.tsv";
+              print "nucl_free_fragments", "nucl_free_fragment_count" >  "frag_size_classification_mqc.tsv";
+              print "pot_nucl_bound_fragments", "nucl_bound_fragment_count" >  "frag_size_classification_mqc.tsv";
           }
 
 
