@@ -46,7 +46,7 @@ inputs:
     type: string
   macs2_qvalue:
     type: float
-    default: 0.01
+    default: 0.05
   effective_genome_size:
     type: long
   bin_size:
