@@ -24,11 +24,11 @@ requirements:
           touch tn5_center_fragment_unsorted.bed
           touch tn5_center_1bp_unsorted.bed
           cat "\${BEDPE}" | awk -f generate_atac_signal_tag.awk
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_29bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_29bp.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_73bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_73bp.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_200bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_200bp.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_fragment_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_fragment.bed"
-          LC_COLLATE=C sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_1bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_1bp.bed"
+          sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_29bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_29bp.bed"
+          sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_73bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_73bp.bed"
+          sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_200bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_200bp.bed"
+          sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_fragment_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_fragment.bed"
+          sort -k1,1 -k2,2n -k3,3n -k4,4 -k5,5n -k6,6n tn5_center_1bp_unsorted.bed > "\${OUTPUT_BASENAME}_tn5_center_1bp.bed"
           rm tn5_center_29bp_unsorted.bed 
           rm tn5_center_73bp_unsorted.bed   
           rm tn5_center_200bp_unsorted.bed  
