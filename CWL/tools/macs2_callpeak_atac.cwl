@@ -61,7 +61,3 @@ outputs:
     type: File
     outputBinding:
       glob: "*_peaks.xls"
-      
-    
-  
-    
