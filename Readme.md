@@ -21,11 +21,11 @@ Moreover, you need to install node.js for evaluation of the built-in java script
 ### 1. How to run:
 For workflow execution with cwltool and toil, you can find example shell scripts in the top directory (`run_*.sh`). They can be use in the following fashion (however, you likely need to slightly adjust the cwlrunner command line specified in the scripts):  
 `bash ./run_cwltool.sh <cwl_workflow> <input_file_or_dir> <output_dir>`  
-Or: `bash ./run_cwltool.sh <cwl_workflow> <input_file_or_dir> <output_dir>`   
+Or: `bash ./run_toil.sh <cwl_workflow> <input_file_or_dir> <output_dir>`
   
-  - `<cwl_workflow>` is a path to a cwl workflow.  
-  - `<input_file_or_dir>` is the path to a YAML file containing input parameters, or the path to a directory with multiple YAML jobs that should be executed
-  - `<output_dir>` is the directory where final output files will be collected
+- `<cwl_workflow>` is a path to a cwl workflow.  
+- `<input_file_or_dir>` is the path to a YAML file containing input parameters, or the path to a directory with multiple YAML jobs that should be executed
+- `<output_dir>` is the directory where final output files will be collected
   
 Monitoring:  
 A log file (the name is ending with `.yaml.log`) will be created for each sample/run. You can open them to check the progress.  
