@@ -15,51 +15,51 @@ inputs:
     type: string
   fastq1:
     doc: |
-      List of fastq files containing the first mate of raw reads.
-      Muliple files are provided if multiplexing of the same library has been done
-      on multiple lanes. The reads comming from different fastq files are pooled
-      after alignment. Also see parameter "fastq2".
+      List of fastq files containing the first mate of raw reads. 
+      Muliple files are provided if  multiplexing of the same library has been done 
+      on multiple lanes. The reads comming from different fastq files are pooled 
+      after alignment. Also see parameter "fastq2". 
     type: 
       type: array
       items: File
   fastq2: 
     doc: |
-      List of fastq files containing the second mate of raw reads.
+      List of fastq files containing the second mate of raw reads. 
       Important: this list has to be of same length as parameter "fastq1".
     type:
       type: array
       items: File
   adapter1: 
     doc: |
-      Adapter sequence for first reads.
-      If not specified (set to "null"), trim_galore will try to autodetect whether ...
-      - Illumina universal adapter (AGATCGGAAGAGC)
-      - Nextera adapter (CTGTCTCTTATA)
-      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)
-      ... was used.
-      You can directly choose one of the above configurations
-      by setting the string to "illumina", "nextera", or "small_rna".
+      Adapter sequence for first reads. 
+      If not specified (set to "null"), trim_galore will try to autodetect whether ...\n
+      - Illumina universal adapter (AGATCGGAAGAGC)\n
+      - Nextera adapter (CTGTCTCTTATA)\n
+      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      ... was used.\n
+      You can directly choose one of the above configurations 
+      by setting the string to "illumina", "nextera", or "small_rna". 
       Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
     type: string?
   adapter2: 
     doc: |
-      Adapter sequence for second reads.
-      If it is not specified (set to "null"), trim_galore will try to autodetect whether ...
-      - Illumina universal adapter (AGATCGGAAGAGC)
-      - Nextera adapter (CTGTCTCTTATA)
-      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)
-      ... was used.
-      You can directly choose one of the above configurations
-      by setting the string to "illumina", "nextera", or "small_rna".
+      Adapter sequence for second reads. 
+      If not specified (set to "null"), trim_galore will try to autodetect whether ...\n
+      - Illumina universal adapter (AGATCGGAAGAGC)\n
+      - Nextera adapter (CTGTCTCTTATA)\n
+      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      ... was used.\n
+      You can directly choose one of the above configurations 
+      by setting the string to "illumina", "nextera", or "small_rna". 
       Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
     type: string?
   genome:
     doc: |
-      Path to reference genome in fasta format.
-      Bowtie2 index files (".1.bt2", ".2.bt2", ...) as well as a samtools index (".fai")
-      has to be located in the same directory.
-      All of these files can be downloaded for the most common genome builds at 
-      https://support.illumina.com/sequencing/sequencing_software/igenome.html.
+      Path to reference genome in fasta format. 
+      Bowtie2 index files (".1.bt2", ".2.bt2", ...) as well as a samtools index (".fai") 
+      has to be located in the same directory.\n
+      All of these files can be downloaded for the most common genome builds at  
+      https://support.illumina.com/sequencing/sequencing_software/igenome.html. 
       Alternatively, you can use "bowtie2-build" or "samtools index" to create them yourself.
     type: File
     secondaryFiles:
@@ -72,27 +72,27 @@ inputs:
       - ^.rev.2.bt2
   genome_info:
     doc: |
-      Path to a tab-delimited file listing chromosome sizes in following fashion:
-      "chromosome_name<tab>total_number_of_bp".
-      For the most common UCSC genome build, you can find corresponding files at:
-      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes.
+      Path to a tab-delimited file listing chromosome sizes in following fashion:\n
+      "chromosome_name<tab>total_number_of_bp".\n
+      For the most common UCSC genome build, you can find corresponding files at: 
+      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes. 
       Or you can generate them yourself using UCSC script fetchChromSizes 
-      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:
-      "fetchChromSizes hg38 > hg38.chrom.sizes".
-      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:
+      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:\n
+      "fetchChromSizes hg38 > hg38.chrom.sizes".\n
+      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:\n
       "awk -v OFS='\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes".
     type: File
   max_mapping_insert_length:
     doc: |
-      Maximum insert length between two reads of a pair. In case of ATACseq,
-      very long insert sizes are possible. So it is recommended to use at least
+      Maximum insert length between two reads of a pair. In case of ATACseq, 
+      very long insert sizes are possible. So it is recommended to use at least 
       a value of 1500. However, please note that alignment will take significantly 
       longer for higher insert sizes. The default is 2500.
     type: long
     default: 2500
   macs2_qvalue:
     doc: |
-      Q-value cutoff used for peak calling by MACS2.
+      Q-value cutoff used for peak calling by MACS2. 
       The default is 0.05.
     type: float
     default: 0.05
@@ -103,15 +103,17 @@ inputs:
     type: long
   bin_size:
     doc: |
-      Bin size used for generation of coverage tracks.
-      The larger the bin size the smaller are the coverage tracks, however,
+      Bin size used for generation of coverage tracks. 
+      The larger the bin size the smaller are the coverage tracks, however, 
       the less precise is the signal. For single bp resolution set to 1.
     type: int
     default: 10
   ignoreForNormalization:
     doc: |
-      List of space-delimited chromosome names that shall be ignored
+      List of space-delimited chromosome names that shall be ignored 
       when calculating the scaling factor. 
+      Specify as space-delimited string. 
+      Default: "chrX chrY chrM"
     type: string?
     default: "chrX chrY chrM"
 

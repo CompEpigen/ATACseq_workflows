@@ -18,19 +18,19 @@ inputs:
     type: File
   genome_info:
     doc: |
-      Path to a tab-delimited file listing chromosome sizes in following fashion:
-      "chromosome_name<tab>total_number_of_bp".
-      For the most common UCSC genome build, you can find corresponding files at:
-      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes.
+      Path to a tab-delimited file listing chromosome sizes in following fashion:\n
+      "chromosome_name<tab>total_number_of_bp".\n
+      For the most common UCSC genome build, you can find corresponding files at: 
+      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes. 
       Or you can generate them yourself using UCSC script fetchChromSizes 
-      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:
-      "fetchChromSizes hg38 > hg38.chrom.sizes".
-      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:
+      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:\n
+      "fetchChromSizes hg38 > hg38.chrom.sizes".\n
+      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:\n
       "awk -v OFS='\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes".
     type: File
   macs2_qvalue:
     doc: |
-      Q-value cutoff used for peak calling by MACS2.
+      Q-value cutoff used for peak calling by MACS2. 
       The default is 0.05.
     type: float
     default: 0.05
@@ -41,15 +41,17 @@ inputs:
     type: long
   bin_size:
     doc: |
-      Bin size used for generation of coverage tracks.
-      The larger the bin size the smaller are the coverage tracks, however,
+      Bin size used for generation of coverage tracks. 
+      The larger the bin size the smaller are the coverage tracks, however, 
       the less precise is the signal. For single bp resolution set to 1.
     type: int
     default: 10
   ignoreForNormalization:
     doc: |
-      List of space-delimited chromosome names that shall be ignored
+      List of space-delimited chromosome names that shall be ignored 
       when calculating the scaling factor. 
+      Specify as space-delimited string. 
+      Default: "chrX chrY chrM"
     type: string?
     default: "chrX chrY chrM"
 
