@@ -26,7 +26,7 @@ inputs:
     type: File
     inputBinding:
       position: 1
-  reference_info:
+  genome_info:
     type: File
     inputBinding:
       position: 2

@@ -10,34 +10,38 @@ requirements:
 
 inputs:
   sample_id:
-    doc: Sample ID. No whitespaces allowed.
+    doc: |
+      Sample ID used for naming the output files.
     type: string
   bam:
-    doc: Aligned, Filtered (and deduplicated if applicable) reads in BAM file.
+    doc: Aligned and filtered (and deduplicated if applicable) reads in BAM file.
     type: File
-  reference_info:
-    doc: Tab delimted file listing chromosome sized in format "chromName<tab>size"
-    type: File
-  macs2_genome_size:
-    doc: Genome size. "hs" for human "mm" for mouse.
-    type: string
   macs2_qvalue:
-    doc: Q-value threshold for peak calling with MACS2
+    doc: |
+      Q-value cutoff used for peak calling by MACS2.
+      The default is 0.05.
     type: float
     default: 0.05
   effective_genome_size:
-    doc: Effective genome size, see https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html
+    doc: |
+      The effectively mappable genome size, please see: 
+      https://deeptools.readthedocs.io/en/latest/content/feature/effectiveGenomeSize.html
     type: long
   bin_size:
-    doc: Bin size for coverage track generation
-    type: int
+    doc: |
+      Bin size used for generation of coverage tracks.
+      The larger the bin size the smaller are the coverage tracks, however,
+      the less precise is the signal. For single bp resolution set to 1.
+    type: int?
     default: 10
   ignoreForNormalization:
-    doc: Chromosomes that shall be ignored for normalization. Usually "chrM", "chrX", and "chrY".
-    type:
-      type: array
-      items: string
-  
+    doc: |
+      List of space-delimited chromosome names that shall be ignored
+      when calculating the scaling factor. 
+    type: string?
+    default: "chrX chrY chrM"
+
+ 
 steps:
   name_sorting_filtered_bam:
       doc: samtools sort - sorting of filtered bam file by read name
@@ -89,8 +93,8 @@ steps:
           - generating_atac_signal_tags/bed_tn5_center_200bp
           - generating_atac_signal_tags/bed_tn5_center_1bp
           - generating_atac_signal_tags/bed_tn5_center_fragment
-      reference_info:
-        source: reference_info
+      genome_info:
+        source: genome_info
       effective_genome_size:
         source: effective_genome_size
       bin_size:
@@ -114,7 +118,7 @@ steps:
           - generating_atac_signal_tags/bed_tn5_center_fragment
         linkMerge: merge_flattened
       genome_size:
-        source: macs2_genome_size
+        source: effective_genome_size
       broad:
         valueFrom: ${return(true)}
       qvalue:
@@ -130,7 +134,7 @@ steps:
       treatment_bed:
         source: generating_atac_signal_tags/bed_tn5_center_29bp
       genome_size:
-        source: macs2_genome_size
+        source: effective_genome_size
       broad:
         valueFrom: ${return(false)}
       qvalue:

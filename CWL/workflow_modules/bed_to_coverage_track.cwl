@@ -6,7 +6,7 @@ class: Workflow
 inputs:
   bed:
     type: File
-  reference_info:
+  genome_info:
     type: File
   effective_genome_size:
     type: long
@@ -32,8 +32,8 @@ steps:
     in:
       bed:
         source: bed
-      reference_info:
-        source: reference_info
+      genome_info:
+        source: genome_info
     out:
       - bam
 

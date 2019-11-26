@@ -10,16 +10,57 @@ requirements:
 
 inputs:
   sample_id:
+    doc: |
+      Sample ID used for naming the output files.
     type: string
   fastq1:
+    doc: |
+      List of fastq files containing the first mate of raw reads.
+      Muliple files are provided if multiplexing of the same library has been done
+      on multiple lanes. The reads comming from different fastq files are pooled
+      after alignment. Also see parameter "fastq2".
     type: 
       type: array
-      items: File
+      items: [File]
   fastq2: 
+    doc: |
+      List of fastq files containing the second mate of raw reads.
+      Important: this list has to be of same length as parameter "fastq1".
     type:
       type: array
-      items: File
-  reference:
+      items: [File]
+  adapter1: 
+    doc: |
+      Adapter sequence for first reads.
+      If not specified (set to "null"), trim_galore will try to autodetect whether ...
+      - Illumina universal adapter (AGATCGGAAGAGC)
+      - Nextera adapter (CTGTCTCTTATA)
+      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)
+      ... was used.
+      You can directly choose one of the above configurations
+      by setting the string to "illumina", "nextera", or "small_rna".
+      Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
+    type: string?
+  adapter2: 
+    doc: |
+      Adapter sequence for second reads.
+      If it is not specified (set to "null"), trim_galore will try to autodetect whether ...
+      - Illumina universal adapter (AGATCGGAAGAGC)
+      - Nextera adapter (CTGTCTCTTATA)
+      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)
+      ... was used.
+      You can directly choose one of the above configurations
+      by setting the string to "illumina", "nextera", or "small_rna".
+      Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
+    type: string?
+  genome:
+    doc: |
+      Path to reference genome in fasta format.
+      Bowtie2 index files (".1.bt2", ".2.bt2", ...) as well as a samtools index (".fai")
+      has to be located in the same directory.
+      All of these files can be downloaded for the most common genome builds at 
+      https://support.illumina.com/sequencing/sequencing_software/igenome.html.
+      Alternatively, you can use "bowtie2-build" or "samtools index" to create them yourself.
     type: File
     secondaryFiles:
       - .fai
@@ -29,24 +70,43 @@ inputs:
       - ^.4.bt2
       - ^.rev.1.bt2
       - ^.rev.2.bt2
-  reference_info:
+  genome_info:
+    doc: |
+      Path to a tab-delimited file listing chromosome sizes in following fashion:
+      "chromosome_name<tab>total_number_of_bp".
+      For the most common UCSC genome build, you can find corresponding files at:
+      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes.
+      Or you can generate them yourself using UCSC script fetchChromSizes 
+      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:
+      "fetchChromSizes hg38 > hg38.chrom.sizes".
+      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:
+      "awk -v OFS='\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes".
     type: File
-  adapter1: 
-    type: string?
-  adapter2:
-    type: string?
   max_mapping_insert_length:
+    doc: |
+      Maximum insert length between two reads of a pair. In case of ATACseq,
+      very long insert sizes are possible. So it is recommended to use at least
+      a value of 1500. However, please note that alignment will take significantly 
+      longer for higher insert sizes. The default is 2500.
     type: long
     default: 2500
-  macs2_genome_size:
-    type: string
   macs2_qvalue:
+    doc: |
+      Q-value cutoff used for peak calling by MACS2.
+      The default is 0.05.
     type: float
     default: 0.05
   effective_genome_size:
+    doc: |
+      The effectively mappable genome size, please see: 
+      https://deeptools.readthedocs.io/en/latest/content/feature/effectiveGenomeSize.html
     type: long
   bin_size:
-    type: int
+    doc: |
+      Bin size used for generation of coverage tracks.
+      The larger the bin size the smaller are the coverage tracks, however,
+      the less precise is the signal. For single bp resolution set to 1.
+    type: int?
     default: 10
   ignoreForNormalization:
     doc: |
@@ -54,7 +114,8 @@ inputs:
       when calculating the scaling factor. 
     type: string?
     default: "chrX chrY chrM"
-  
+
+
 steps:
   trim_and_map:
     run: "../workflow_modules/trim_and_map.cwl"
@@ -65,8 +126,8 @@ steps:
         source: fastq1
       fastq2: 
         source: fastq2
-      reference:
-        source: reference
+      genome:
+        source: genome
       adapter1: 
         source: adapter1
       adapter2:
@@ -154,8 +215,8 @@ steps:
           - generating_atac_signal_tags/bed_tn5_center_200bp
           - generating_atac_signal_tags/bed_tn5_center_1bp
           - generating_atac_signal_tags/bed_tn5_center_fragment
-      reference_info:
-        source: reference_info
+      genome_info:
+        source: genome_info
       effective_genome_size:
         source: effective_genome_size
       bin_size:
@@ -179,7 +240,7 @@ steps:
           - generating_atac_signal_tags/bed_tn5_center_fragment
         linkMerge: merge_flattened
       genome_size:
-        source: macs2_genome_size
+        source: effective_genome_size
       broad:
         valueFrom: ${return(true)}
       qvalue:
@@ -195,7 +256,7 @@ steps:
       treatment_bed:
         source: generating_atac_signal_tags/bed_tn5_center_29bp
       genome_size:
-        source: macs2_genome_size
+        source: effective_genome_size
       broad:
         valueFrom: ${return(false)}
       qvalue:

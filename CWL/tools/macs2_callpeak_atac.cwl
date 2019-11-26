@@ -33,8 +33,7 @@ inputs:
         position: 101
         prefix: "--treatment"
   genome_size:
-    doc: can be "mm", "hs", "ce", "dm", or the total number of genomic bp 
-    type: string
+    type: long
     inputBinding:
         position: 3
         prefix: "--gsize"

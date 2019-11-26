@@ -10,10 +10,10 @@ fastq2:
     path: ./sample1_2.fastq
   - class: File
     path: ./sample2_2.fastq
-reference:
+genome:
   class: File
   path: ./ref_genome.fa
-reference_info:
+genome_info:
   class: File
   path: ./ref_genome.chrom.sizes
 macs2_genome_size: "199"

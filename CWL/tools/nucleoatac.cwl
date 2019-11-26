@@ -25,7 +25,7 @@ inputs:
       prefix: --bed
       position: 1
   fasta:
-    doc: reference genome in fasta format + samtools faidx index
+    doc: genome genome in fasta format + samtools faidx index
     type: File
     secondaryFiles: [ ".fai" ]
     inputBinding:
