@@ -16,6 +16,18 @@ inputs:
   bam:
     doc: Aligned and filtered (and deduplicated if applicable) reads in BAM file.
     type: File
+  genome_info:
+    doc: |
+      Path to a tab-delimited file listing chromosome sizes in following fashion:
+      "chromosome_name<tab>total_number_of_bp".
+      For the most common UCSC genome build, you can find corresponding files at:
+      https://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes.
+      Or you can generate them yourself using UCSC script fetchChromSizes 
+      (http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:
+      "fetchChromSizes hg38 > hg38.chrom.sizes".
+      If you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:
+      "awk -v OFS='\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes".
+    type: File
   macs2_qvalue:
     doc: |
       Q-value cutoff used for peak calling by MACS2.
