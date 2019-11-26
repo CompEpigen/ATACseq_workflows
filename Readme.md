@@ -4,7 +4,8 @@ This repository includes workflows for upstream processing of ATAC-seq data. The
 
 ## CWL Workflows:  
 Following workflows are available in the directory `./CWL/workflows`:
-  * `ATACseq_pipeline.cwl` - works with paired end ATAC data
+  * `ATACseq.cwl` - works with paired end ATAC data
+  * `ATACseq_aligned.cwl` - works with paired end ATAC data starting with already aligned reads
   
 They depend on subworkflows located in `./CWL/workflow_modules` and CommandLineTool wrapper located in `./CWL/tools`.
 
