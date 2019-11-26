@@ -21,14 +21,14 @@ inputs:
       after alignment. Also see parameter "fastq2".
     type: 
       type: array
-      items: [File]
+      items: File
   fastq2: 
     doc: |
       List of fastq files containing the second mate of raw reads.
       Important: this list has to be of same length as parameter "fastq1".
     type:
       type: array
-      items: [File]
+      items: File
   adapter1: 
     doc: |
       Adapter sequence for first reads.
