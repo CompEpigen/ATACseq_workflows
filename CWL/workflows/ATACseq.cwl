@@ -32,13 +32,9 @@ inputs:
   reference_info:
     type: File
   adapter1: 
-    type: 
-      type: array
-      items: [string, "null"]
+    type: string?
   adapter2:
-    type: 
-      type: array
-      items: [string, "null"]
+    type: string?
   max_mapping_insert_length:
     type: long
     default: 2500
@@ -53,15 +49,16 @@ inputs:
     type: int
     default: 10
   ignoreForNormalization:
-    type:
-      type: array
-      items: string
-    default: ["chrX", "chrY", "chrM"]
+    doc: |
+      List of space-delimited chromosome names that shall be ignored
+      when calculating the scaling factor. 
+    type: string
+    default: "chrX chrY chrM"
   
 steps:
   trim_and_map:
     run: "../workflow_modules/trim_and_map.cwl"
-    scatter: [fastq1, fastq2, adapter1, adapter2]
+    scatter: [fastq1, fastq2]
     scatterMethod: 'dotproduct'
     in:
       fastq1:

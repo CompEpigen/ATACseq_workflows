@@ -13,9 +13,11 @@ inputs:
   bin_size:
     type: int
   ignoreForNormalization:
-    type:
-      type: array
-      items: string
+    doc: |
+      List of space-delimited chromosome names that shall be ignored
+      when calculating the scaling factor. 
+    type: string
+    default: "chrX chrY chrM"
 
 ### WORKFLOW STEPS:
 ##################################################
