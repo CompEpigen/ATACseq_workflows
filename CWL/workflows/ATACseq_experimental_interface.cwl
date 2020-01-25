@@ -31,28 +31,32 @@ inputs:
       items: File
   adapter1: 
     doc: |
-      Adapter sequence for first reads. 
-      If not specified (set to "null"), trim_galore will try to autodetect whether ...\n
-      - Illumina universal adapter (AGATCGGAAGAGC)\n
-      - Nextera adapter (CTGTCTCTTATA)\n
-      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
-      ... was used.\n
-      You can directly choose one of the above configurations 
-      by setting the string to "illumina", "nextera", or "small_rna". 
-      Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
-    type: string?
+      Adapter to be trimmed from first reads. Cab be one of the following: \n
+      - "nextera" for the Nextera adapter (CTGTCTCTTATA)\n
+      - "illumina" for the Illumina universal adapter (AGATCGGAAGAGC)\n
+      - "small_rna" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      - "auto" to automatically detect the write setting
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
   adapter2: 
     doc: |
-      Adapter sequence for second reads. 
-      If not specified (set to "null"), trim_galore will try to autodetect whether ...\n
-      - Illumina universal adapter (AGATCGGAAGAGC)\n
-      - Nextera adapter (CTGTCTCTTATA)\n
-      - Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
-      ... was used.\n
-      You can directly choose one of the above configurations 
-      by setting the string to "illumina", "nextera", or "small_rna". 
-      Or you specify the adaptor string manually (e.g. "AGATCGGAAGAGC").
-    type: string?
+      Adapters to be trimmed from second read. Cab be one of the following: \n
+      - "nextera" for the Nextera adapter (CTGTCTCTTATA)\n
+      - "illumina" for the Illumina universal adapter (AGATCGGAAGAGC)\n
+      - "small_rna" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      - "auto" to automatically detect the write setting
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
   genome:
     doc: |
       Path to reference genome in fasta format. 

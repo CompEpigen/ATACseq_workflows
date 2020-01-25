@@ -25,9 +25,21 @@ inputs:
       - ^.rev.1.bt2
       - ^.rev.2.bt2
   adapter1: 
-    type: [string, "null"]
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
   adapter2:
-    type: [string, "null"]
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
   is_paired_end:
     type: boolean
   max_mapping_insert_length:

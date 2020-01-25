@@ -32,26 +32,32 @@ inputs:
       position: 11
   adapter1:
     doc: |
-      Adapter sequence for first reads.
-      if not specified, trim_galore will try to autodetect whether ...
-      - Illumina universal adapter (AGATCGGAAGAGC)
-      - Nextera adapter (CTGTCTCTTATA)
-      - Illumina Small RNA 3' Adapter (TGGAATTCTCGG)
-      ... was used.
-      You can directly choose one of the above configurations
-      by setting the string to "illumina", "nextera", or "small_rna".
-    type: string?
+      Adapter to be trimmed from first reads. Cab be one of the following: \n
+      - "nextera" for the Nextera adapter (CTGTCTCTTATA)\n
+      - "illumina" for the Illumina universal adapter (AGATCGGAAGAGC)\n
+      - "small_rna" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      - "auto" to automatically detect the write setting
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
   adapter2:
     doc: |
-      Adapter sequence for second reads - only for paired end data.
-      if not specified, trim_galore will try to autodetect whether ...
-      - Illumina universal adapter (AGATCGGAAGAGC)
-      - Nextera adapter (CTGTCTCTTATA)
-      - Illumina Small RNA 3' Adapter (TGGAATTCTCGG)
-      ... was used.
-      You can directly choose one of the above configurations
-      by setting the adapter1 string to "illumina", "nextera", or "small_rna".
-    type: string?
+      Adapters to be trimmed from second read. Cab be one of the following: \n
+      - "nextera" for the Nextera adapter (CTGTCTCTTATA)\n
+      - "illumina" for the Illumina universal adapter (AGATCGGAAGAGC)\n
+      - "small_rna" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n
+      - "auto" to automatically detect the write setting
+    type:
+      type: enum
+      symbols:
+        - nextera
+        - illumina
+        - small_rna
+        - auto
     
   # additional optional input:
   qual_trim_cutoff:
