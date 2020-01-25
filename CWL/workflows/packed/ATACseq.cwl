@@ -283,7 +283,7 @@
                     "id": "#deeptools_bamCoverage.cwl/effective_genome_size"
                 },
                 {
-                    "doc": "List of space-delimited chromosome names that shall be ignored\nwhen calculating the scaling factor. \n",
+                    "doc": "List of space-delimited chromosome names that shall be ignored \nwhen calculating the scaling factor. \nSpecify as space-delimited string. \nDefault: \"chrX chrY chrM\"\n",
                     "type": [
                         "null",
                         "string"
@@ -1464,19 +1464,29 @@
             "baseCommand": "trim_galore",
             "inputs": [
                 {
-                    "doc": "Adapter sequence for first reads.\nif not specified, trim_galore will try to autodetect whether ...\n- Illumina universal adapter (AGATCGGAAGAGC)\n- Nextera adapter (CTGTCTCTTATA)\n- Illumina Small RNA 3' Adapter (TGGAATTCTCGG)\n... was used.\nYou can directly choose one of the above configurations\nby setting the string to \"illumina\", \"nextera\", or \"small_rna\".\n",
-                    "type": [
-                        "null",
-                        "string"
-                    ],
+                    "doc": "Adapter to be trimmed from first reads. Cab be one of the following: \\n\n- \"nextera\" for the Nextera adapter (CTGTCTCTTATA)\\n\n- \"illumina\" for the Illumina universal adapter (AGATCGGAAGAGC)\\n\n- \"small_rna\" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\\n\n- \"auto\" to automatically detect the write setting\n",
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#trim_galore.cwl/adapter1/nextera",
+                            "#trim_galore.cwl/adapter1/illumina",
+                            "#trim_galore.cwl/adapter1/small_rna",
+                            "#trim_galore.cwl/adapter1/auto"
+                        ]
+                    },
                     "id": "#trim_galore.cwl/adapter1"
                 },
                 {
-                    "doc": "Adapter sequence for second reads - only for paired end data.\nif not specified, trim_galore will try to autodetect whether ...\n- Illumina universal adapter (AGATCGGAAGAGC)\n- Nextera adapter (CTGTCTCTTATA)\n- Illumina Small RNA 3' Adapter (TGGAATTCTCGG)\n... was used.\nYou can directly choose one of the above configurations\nby setting the adapter1 string to \"illumina\", \"nextera\", or \"small_rna\".\n",
-                    "type": [
-                        "null",
-                        "string"
-                    ],
+                    "doc": "Adapters to be trimmed from second read. Cab be one of the following: \\n\n- \"nextera\" for the Nextera adapter (CTGTCTCTTATA)\\n\n- \"illumina\" for the Illumina universal adapter (AGATCGGAAGAGC)\\n\n- \"small_rna\" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\\n\n- \"auto\" to automatically detect the write setting\n",
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#trim_galore.cwl/adapter2/nextera",
+                            "#trim_galore.cwl/adapter2/illumina",
+                            "#trim_galore.cwl/adapter2/small_rna",
+                            "#trim_galore.cwl/adapter2/auto"
+                        ]
+                    },
                     "id": "#trim_galore.cwl/adapter2"
                 },
                 {
@@ -1671,7 +1681,7 @@
                     "id": "#bed_to_coverage_track.cwl/genome_info"
                 },
                 {
-                    "doc": "List of space-delimited chromosome names that shall be ignored\nwhen calculating the scaling factor. \n",
+                    "doc": "List of space-delimited chromosome names that shall be ignored \nwhen calculating the scaling factor. \nSpecify as space-delimited string. \nDefault: \"chrX chrY chrM\"\n",
                     "type": [
                         "null",
                         "string"
@@ -2004,17 +2014,27 @@
             ],
             "inputs": [
                 {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#trim_and_map.cwl/adapter1/nextera",
+                            "#trim_and_map.cwl/adapter1/illumina",
+                            "#trim_and_map.cwl/adapter1/small_rna",
+                            "#trim_and_map.cwl/adapter1/auto"
+                        ]
+                    },
                     "id": "#trim_and_map.cwl/adapter1"
                 },
                 {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#trim_and_map.cwl/adapter2/nextera",
+                            "#trim_and_map.cwl/adapter2/illumina",
+                            "#trim_and_map.cwl/adapter2/small_rna",
+                            "#trim_and_map.cwl/adapter2/auto"
+                        ]
+                    },
                     "id": "#trim_and_map.cwl/adapter2"
                 },
                 {
@@ -2253,23 +2273,33 @@
             ],
             "inputs": [
                 {
-                    "doc": "Adapter sequence for first reads.\nIf not specified (set to \"null\"), trim_galore will try to autodetect whether ...\n- Illumina universal adapter (AGATCGGAAGAGC)\n- Nextera adapter (CTGTCTCTTATA)\n- Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n... was used.\nYou can directly choose one of the above configurations\nby setting the string to \"illumina\", \"nextera\", or \"small_rna\".\nOr you specify the adaptor string manually (e.g. \"AGATCGGAAGAGC\").\n",
-                    "type": [
-                        "null",
-                        "string"
-                    ],
+                    "doc": "Adapter to be trimmed from first reads. Cab be one of the following: \\n\n- \"nextera\" for the Nextera adapter (CTGTCTCTTATA)\\n\n- \"illumina\" for the Illumina universal adapter (AGATCGGAAGAGC)\\n\n- \"small_rna\" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\\n\n- \"auto\" to automatically detect the write setting\n",
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#main/adapter1/nextera",
+                            "#main/adapter1/illumina",
+                            "#main/adapter1/small_rna",
+                            "#main/adapter1/auto"
+                        ]
+                    },
                     "id": "#main/adapter1"
                 },
                 {
-                    "doc": "Adapter sequence for second reads.\nIf it is not specified (set to \"null\"), trim_galore will try to autodetect whether ...\n- Illumina universal adapter (AGATCGGAAGAGC)\n- Nextera adapter (CTGTCTCTTATA)\n- Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\n... was used.\nYou can directly choose one of the above configurations\nby setting the string to \"illumina\", \"nextera\", or \"small_rna\".\nOr you specify the adaptor string manually (e.g. \"AGATCGGAAGAGC\").\n",
-                    "type": [
-                        "null",
-                        "string"
-                    ],
+                    "doc": "Adapters to be trimmed from second read. Cab be one of the following: \\n\n- \"nextera\" for the Nextera adapter (CTGTCTCTTATA)\\n\n- \"illumina\" for the Illumina universal adapter (AGATCGGAAGAGC)\\n\n- \"small_rna\" for the Illumina Small RNA 3-prime Adapter (TGGAATTCTCGG)\\n\n- \"auto\" to automatically detect the write setting\n",
+                    "type": {
+                        "type": "enum",
+                        "symbols": [
+                            "#main/adapter2/nextera",
+                            "#main/adapter2/illumina",
+                            "#main/adapter2/small_rna",
+                            "#main/adapter2/auto"
+                        ]
+                    },
                     "id": "#main/adapter2"
                 },
                 {
-                    "doc": "Bin size used for generation of coverage tracks.\nThe larger the bin size the smaller are the coverage tracks, however,\nthe less precise is the signal. For single bp resolution set to 1.\n",
+                    "doc": "Bin size used for generation of coverage tracks. \nThe larger the bin size the smaller are the coverage tracks, however, \nthe less precise is the signal. For single bp resolution set to 1.\n",
                     "type": "int",
                     "default": 10,
                     "id": "#main/bin_size"
@@ -2280,7 +2310,7 @@
                     "id": "#main/effective_genome_size"
                 },
                 {
-                    "doc": "List of fastq files containing the first mate of raw reads.\nMuliple files are provided if multiplexing of the same library has been done\non multiple lanes. The reads comming from different fastq files are pooled\nafter alignment. Also see parameter \"fastq2\".\n",
+                    "doc": "List of fastq files containing the first mate of raw reads. \nMuliple files are provided if  multiplexing of the same library has been done \non multiple lanes. The reads comming from different fastq files are pooled \nafter alignment. Also see parameter \"fastq2\". \n",
                     "type": {
                         "type": "array",
                         "items": "File"
@@ -2288,7 +2318,7 @@
                     "id": "#main/fastq1"
                 },
                 {
-                    "doc": "List of fastq files containing the second mate of raw reads.\nImportant: this list has to be of same length as parameter \"fastq1\".\n",
+                    "doc": "List of fastq files containing the second mate of raw reads. \nImportant: this list has to be of same length as parameter \"fastq1\".\n",
                     "type": {
                         "type": "array",
                         "items": "File"
@@ -2296,7 +2326,7 @@
                     "id": "#main/fastq2"
                 },
                 {
-                    "doc": "Path to reference genome in fasta format.\nBowtie2 index files (\".1.bt2\", \".2.bt2\", ...) as well as a samtools index (\".fai\")\nhas to be located in the same directory.\nAll of these files can be downloaded for the most common genome builds at \nhttps://support.illumina.com/sequencing/sequencing_software/igenome.html.\nAlternatively, you can use \"bowtie2-build\" or \"samtools index\" to create them yourself.\n",
+                    "doc": "Path to reference genome in fasta format. \nBowtie2 index files (\".1.bt2\", \".2.bt2\", ...) as well as a samtools index (\".fai\") \nhas to be located in the same directory.\\n\nAll of these files can be downloaded for the most common genome builds at  \nhttps://support.illumina.com/sequencing/sequencing_software/igenome.html. \nAlternatively, you can use \"bowtie2-build\" or \"samtools index\" to create them yourself.\n",
                     "type": "File",
                     "secondaryFiles": [
                         ".fai",
@@ -2310,12 +2340,12 @@
                     "id": "#main/genome"
                 },
                 {
-                    "doc": "Path to a tab-delimited file listing chromosome sizes in following fashion:\n\"chromosome_name<tab>total_number_of_bp\".\nFor the most common UCSC genome build, you can find corresponding files at:\nhttps://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes.\nOr you can generate them yourself using UCSC script fetchChromSizes \n(http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:\n\"fetchChromSizes hg38 > hg38.chrom.sizes\".\nIf you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:\n\"awk -v OFS='\\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes\".\n",
+                    "doc": "Path to a tab-delimited file listing chromosome sizes in following fashion:\\n\n\"chromosome_name<tab>total_number_of_bp\".\\n\nFor the most common UCSC genome build, you can find corresponding files at: \nhttps://github.com/CompEpigen/ATACseq_workflows/tree/master/chrom_sizes. \nOr you can generate them yourself using UCSC script fetchChromSizes \n(http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes) in following fashion:\\n\n\"fetchChromSizes hg38 > hg38.chrom.sizes\".\\n\nIf you are dealing with a non-UCSC build, you can generate such a file from a samtools index using:\\n\n\"awk -v OFS='\\t' {'print $1,$2'} hg38.fa.fai > hg38.chrom.sizes\".\n",
                     "type": "File",
                     "id": "#main/genome_info"
                 },
                 {
-                    "doc": "List of space-delimited chromosome names that shall be ignored\nwhen calculating the scaling factor. \n",
+                    "doc": "List of space-delimited chromosome names that shall be ignored \nwhen calculating the scaling factor. \nSpecify as space-delimited string. \nDefault: \"chrX chrY chrM\"\n",
                     "type": [
                         "null",
                         "string"
@@ -2324,13 +2354,13 @@
                     "id": "#main/ignoreForNormalization"
                 },
                 {
-                    "doc": "Q-value cutoff used for peak calling by MACS2.\nThe default is 0.05.\n",
+                    "doc": "Q-value cutoff used for peak calling by MACS2. \nThe default is 0.05.\n",
                     "type": "float",
                     "default": 0.05,
                     "id": "#main/macs2_qvalue"
                 },
                 {
-                    "doc": "Maximum insert length between two reads of a pair. In case of ATACseq,\nvery long insert sizes are possible. So it is recommended to use at least\na value of 1500. However, please note that alignment will take significantly \nlonger for higher insert sizes. The default is 2500.\n",
+                    "doc": "Maximum insert length between two reads of a pair. In case of ATACseq, \nvery long insert sizes are possible. So it is recommended to use at least \na value of 1500. However, please note that alignment will take significantly \nlonger for higher insert sizes. The default is 2500.\n",
                     "type": "long",
                     "default": 2500,
                     "id": "#main/max_mapping_insert_length"
