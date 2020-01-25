@@ -43,6 +43,7 @@ inputs:
         - illumina
         - small_rna
         - auto
+    default: nextera
   adapter2: 
     doc: |
       Adapters to be trimmed from second read. Cab be one of the following: \n
@@ -57,6 +58,7 @@ inputs:
         - illumina
         - small_rna
         - auto
+    default: nextera
   genome:
     doc: |
       Path to reference genome in fasta format. 

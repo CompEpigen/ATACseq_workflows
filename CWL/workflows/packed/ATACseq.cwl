@@ -2283,6 +2283,7 @@
                             "#main/adapter1/auto"
                         ]
                     },
+                    "default": "nextera",
                     "id": "#main/adapter1"
                 },
                 {
@@ -2296,6 +2297,7 @@
                             "#main/adapter2/auto"
                         ]
                     },
+                    "default": "nextera",
                     "id": "#main/adapter2"
                 },
                 {
