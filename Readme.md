@@ -21,7 +21,7 @@ Moreover, you need to install node.js for evaluation of the built-in java script
 
 ### 1. How to run:
 For workflow execution with cwltool and toil, you can find example shell scripts in the top directory (`run_*.sh`). They can be use in the following fashion (however, you likely need to slightly adjust the cwlrunner command line specified in the scripts):  
-`bash ./run_cwltool.sh <cwl_workflow> <input_file_or_dir> <output_dir>`  
+`bash ./run_cwltool.sh <cwl_workflow> <input_file_or_dir> <output_dir>`   
 Or: `bash ./run_toil.sh <cwl_workflow> <input_file_or_dir> <output_dir>`
   
 - `<cwl_workflow>` is a path to a cwl workflow.  
