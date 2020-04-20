@@ -1,0 +1,34 @@
+{
+    "description": "Highly portable workflows for processing of ATAC-seq data based on the Common Workflow Language", 
+    "license": "Apache 2.0", 
+    "title": "Highly portable workflows for processing of ATAC-seq data based on the Common Workflow Language", 
+    "version": "1.2.9", 
+    "upload_type": "software", 
+    "publication_date": "2020-04-20", 
+    "creators": [
+        {
+            "affiliation": "German Cancer Research Center", 
+            "name": "Kersten Breuer"
+        },
+        {
+            "affiliation": "German Cancer Research Center", 
+            "name": "Yassen Assenov"
+        },
+        {
+            "affiliation": "German Cancer Research Center", 
+            "name": "Pavlo Lutsik"
+        },
+        {
+            "affiliation": "German Cancer Research Center", 
+            "name": "Christoph Plass"
+        },
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/CompEpigen/ATACseq_workflows/tree/1.2.9", 
+            "relation": "isSupplementTo"
+        }
+    ]
+}
